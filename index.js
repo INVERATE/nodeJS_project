@@ -1,16 +1,17 @@
+import fs from 'fs';
 import readline from 'readline';
 
-// Corpus d'exemple
-const corpus = `le chat mange une souris. le chien aboie fort. le chat dort. le chien court vite.`;
+// 1. Lire le corpus depuis le fichier texte
+const corpus = fs.readFileSync('./datasets/lacomediehumaine.txt', 'utf-8');
 
-// Tokenisation
+// 2. Tokenisation du texte
 function tokenize(text) {
     return text.toLowerCase().replace(/[.,!?]/g, '').split(/\s+/);
 }
 
 const tokens = tokenize(corpus);
 
-// Construire les transitions (bigrammes)
+// 3. Construire les transitions entre les mots
 const transitions = {};
 for (let i = 0; i < tokens.length - 1; i++) {
     const current = tokens[i];
@@ -19,7 +20,7 @@ for (let i = 0; i < tokens.length - 1; i++) {
     transitions[current][next] = (transitions[current][next] || 0) + 1;
 }
 
-// Normaliser les probabilités
+// 4. Normaliser les probabilités
 for (let current in transitions) {
     const total = Object.values(transitions[current]).reduce((a, b) => a + b, 0);
     for (let next in transitions[current]) {
@@ -27,34 +28,30 @@ for (let current in transitions) {
     }
 }
 
-// Prédiction
-function predictNext(word) {
-    const options = transitions[word.toLowerCase()];
-    if (!options) return null;
-
-    const rand = Math.random();
-    let cumulative = 0;
-
-    for (let next in options) {
-        cumulative += options[next];
-        if (rand < cumulative) return next;
-    }
-    return null;
-}
-
-// Interface utilisateur
+// 5. Interface utilisateur
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
 });
 
 rl.question('Entrez un mot : ', function(input) {
-    const prediction = predictNext(input);
-    if (prediction) {
-        console.log(`Mot suivant possible après "${input}": ${prediction}`);
+    const word = input.toLowerCase();
+    const options = transitions[word];
+
+    if (options) {
+        console.log(`\nProbabilités normalisées pour "${word}" :`);
+        let sum = 0;
+
+        for (let next in options) {
+            const prob = options[next];
+            sum += prob;
+            console.log(`→ ${next} : ${prob.toFixed(4)}`);
+        }
+
+        console.log(`\n✔ Somme totale : ${sum.toFixed(4)}`);
     } else {
-        console.log(`Aucune prédiction disponible pour "${input}".`);
+        console.log(`\nAucune donnée disponible pour "${word}".`);
     }
-    console.log(transitions)
+
     rl.close();
 });
