@@ -107,6 +107,32 @@ function predictLetterCompletion(wordSoFar) {
     return result;
 }
 
+// ** Nouvelle fonction : probas des prochaines lettres selon mots candidats **
+function predictNextLetterProbs(currentPrefix, options) {
+    const letterProbs = {};
+    let totalWeight = 0;
+
+    for (let word in options) {
+        if (!word.startsWith(currentPrefix)) continue;
+
+        const nextLetter = word[currentPrefix.length];
+        if (!nextLetter) continue;
+
+        const wordProb = options[word];
+        totalWeight += wordProb;
+
+        if (!letterProbs[nextLetter]) letterProbs[nextLetter] = 0;
+        letterProbs[nextLetter] += wordProb;
+    }
+
+    // Normalisation
+    for (let l in letterProbs) {
+        letterProbs[l] /= totalWeight;
+    }
+
+    return letterProbs;
+}
+
 // === 6. Interface interactive ===
 
 const rl = readline.createInterface({
@@ -149,9 +175,27 @@ function askLetter() {
         currentWord += input.toLowerCase();
 
         const { options } = getNextWordProbabilities(phrase);
+
+        // Suggestion complétion mot
         let suggestion = options ? completeWord(currentWord, options) : null;
 
-        if (!suggestion) {
+        // Affichage proba prochaines lettres selon mots candidats
+        if (options) {
+            const nextLetterProbs = predictNextLetterProbs(currentWord, options);
+            if (Object.keys(nextLetterProbs).length > 0) {
+                console.log(`📈 Probabilités des prochaines lettres :`);
+                const sorted = Object.entries(nextLetterProbs)
+                    .sort((a, b) => b[1] - a[1])
+                    .map(([l, p]) => ({
+                        lettre: l === ' ' ? '(espace)' : l,
+                        probabilité: p.toFixed(3)
+                    }));
+                console.table(sorted);
+            } else {
+                console.log(`❌ Aucune lettre probable à cette position`);
+            }
+        } else {
+            // fallback
             suggestion = predictLetterCompletion(currentWord);
         }
 
