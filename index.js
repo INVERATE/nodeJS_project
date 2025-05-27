@@ -2,7 +2,7 @@ import fs from 'fs';
 import readline from 'readline';
 
 // === 1. Lire le corpus ===
-const corpus = fs.readFileSync('./datasets/lacomediehumaine.txt', 'utf-8');
+const corpus = fs.readFileSync('./datasets/Proust.txt', 'utf-8');
 
 // === 2. Tokenisation ===
 function tokenize(text) {
