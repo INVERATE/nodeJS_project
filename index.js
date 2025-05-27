@@ -205,5 +205,5 @@ function askLetter() {
 }
 
 console.log('\n--- 🤖 Assistant de rédaction intelligent ---');
-console.log('💡 Tape chaque lettre, " " pour valider un mot, "stop" pour finir.\n');
+console.log('💡 Tape chaque lettre, " " pour valider un mot, "stop" pour finir. \n');
 askLetter();
