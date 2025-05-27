@@ -41,14 +41,23 @@ rl.question('Entrez un mot : ', function(input) {
     if (options) {
         console.log(`\nProbabilités normalisées pour "${word}" :`);
         let sum = 0;
+        let maxProb = 0;
+        let bestNext = null;
 
         for (let next in options) {
             const prob = options[next];
             sum += prob;
+
             console.log(`→ ${next} : ${prob.toFixed(4)}`);
+
+            if (prob > maxProb) {
+                maxProb = prob;
+                bestNext = next;
+            }
         }
 
         console.log(`\n✔ Somme totale : ${sum.toFixed(4)}`);
+        console.log(`⭐ Mot avec la plus forte probabilité : "${bestNext}" (${maxProb.toFixed(4)})`);
     } else {
         console.log(`\nAucune donnée disponible pour "${word}".`);
     }
