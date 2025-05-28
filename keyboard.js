@@ -271,8 +271,10 @@ const Keyboard = {
 
 window.addEventListener("DOMContentLoaded", function () {
     Keyboard.init();
-});
 
+    // Exemple : notifier le main process
+    window.electronAPI.envoyerMessage("Le clavier a été initialisé !");
+});
 
 
 
