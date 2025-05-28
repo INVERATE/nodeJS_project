@@ -9,3 +9,4 @@
 .idea/
 .backup/
 .node_modules/
+/vcs.xml
