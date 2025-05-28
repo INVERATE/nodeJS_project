@@ -1,105 +1,99 @@
-#keyboard {
-    display: inline-block;
-    background: #f2f2f2;
-    padding: 10px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    font-family: Arial, sans-serif;
-    gap: 10px;
+/* style.css */
+.text-area {
+    padding: 5px;
+    width: calc(100vw - 30px);
+    height: calc(100vh - 295px);
 }
 
-.row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(50px, auto));
-    gap: 10px;
-    margin-bottom: 10px;
+.keyboard {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    padding: 5px 0;
+    background: #57a8da;
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+    transition: bottom 0.4s;
 }
 
-.key {
-    background: #eee;
-    border: 1px solid #999;
-    padding: 15px;
+.keyboard--hidden {
+    bottom: -100%;
+}
+
+.keyboard__keys {
     text-align: center;
+}
+
+.keyboard__key {
+    height: 45px;
+    width: 6%;
+    max-width: 90px;
+    margin: 3px;
+    border-radius: 4px;
+    border: none;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 1.05rem;
+    outline: none;
     cursor: pointer;
-    font-size: 1rem;
-    user-select: none;
-    transition: background 0.2s;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    vertical-align: top;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+    position: relative;
 }
 
-.key:hover {
-    background: #ccc;
+.keyboard__key:active {
+    background: rgba(255, 255, 255, 0.12);
 }
 
-/* Touches spéciales */
-.key.space {
-    grid-column: span 2;
-    padding-left: 50px;
-    padding-right: 50px;
+.keyboard__key--wide {
+    width: 12%;
 }
 
-.key.enter {
-    grid-column: span 1;
+.keyboard__key--extra--wide {
+    width: 36%;
+    max-width: 500px;
 }
 
-.key.backspace {
-    grid-column: span 1;
+.keyboard__key--activatable::after {
+    content: "";
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 8px;
+    height: 8px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 50%;
 }
 
-
-#keyboard {
-    display: inline-block;
-    background: #f9f9f9;
-    padding: 10px;
-    border: 1px solid #999;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    font-family: Arial, sans-serif;
+.keyboard__key--active::after {
+    background: #c5edff;
 }
 
-/* Chaque ligne du clavier */
-.row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(40px, auto));
-    gap: 2px; /* espace visible entre touches */
-    margin-bottom: 5px;
+.keyboard__key--dark {
+    background: rgba(0, 0, 0, 0.25);
 }
 
-/* Style de chaque touche */
-.key {
-    background: #eee;
-    border: 1px solid #999;
-    padding: 15px;
-    text-align: center;
-    cursor: pointer;
-    font-size: 1rem;
-    user-select: none;
-    transition: background 0.2s;
+.small {
+    width: 4px;
+    height: 4px;
 }
 
-.small { width: 40px; height: 40px; }
-.medium { width: 60px; height: 60px; }
-.large { width: 100px; height: 60px; }
-
-.key:hover {
-    background: #ccc;
+.medium {
+    width: 8px;
+    height: 8px;
 }
 
-.key {
-    transition: transform 0.2s ease;
+.large {
+    width: 12px;
+    height: 12px;
 }
 
-.active-key {
-    transform: scale(1.2);
-}
-/* Touches spéciales (plus larges) */
-.key.space {
-    grid-column: span 3;
-}
-
-.key.enter {
-    grid-column: span 2;
-}
-
-.key.backspace {
-    grid-column: span 2;
+.keyboard__key.active {
+    transform: scale(1.3);
+    transition: transform 0.1s ease;
+    z-index: 10;
 }
