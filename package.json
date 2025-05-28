@@ -2,9 +2,17 @@
   "name": "untitled",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
   },
-  "private": true
+  "private": true,
+  "dependencies": {
+    "blessed": "^0.1.81"
+  },
+  "devDependencies": {
+    "electron": "^36.3.1",
+    "electron-reload": "^2.0.0-alpha.1"
+  }
 }
