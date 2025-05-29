@@ -1,4 +1,5 @@
-// script.js
+import * as prediction from "./prediction.js"
+
 const Keyboard = {
     elements: {
         main: null,

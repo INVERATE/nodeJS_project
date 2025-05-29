@@ -1,59 +1,63 @@
 import fs from 'fs';
 import readline from 'readline';
 
-// === 1. Lire le corpus ===
+//  1. Lire le corpus
 const corpus = fs.readFileSync('./datasets/lacomediehumaine.txt', 'utf-8');
 
-// === 2. Tokenisation ===
+//  2. Tokenisation
 function tokenize(text) {
     return text.toLowerCase().replace(/[.,!?;:()"'-]/g, '').split(/\s+/);
 }
 const tokens = tokenize(corpus);
 
-// === 3. Chaîne de Markov sur les mots ===
-const wordTransitions = new Map();
+//  3. Chaîne de Markov sur les mots
 
-for (let n = 1; n <= 5; n++) {
-    for (let i = 0; i <= tokens.length - n; i++) {
-        const key = tokens.slice(i, i + n).join(' ');
-        const next = tokens[i + n];
-        if (!next) continue;
 
-        if (!wordTransitions.has(key)) wordTransitions.set(key, {});
-        const nextWords = wordTransitions.get(key);
-        nextWords[next] = (nextWords[next] || 0) + 1;
+function markovMot() {
+    const wordTransitions = new Map();
+    for (let n = 1; n <= 5; n++) {
+        for (let i = 0; i <= tokens.length - n; i++) {
+            const key = tokens.slice(i, i + n).join(' ');
+            const next = tokens[i + n];
+            if (!next) continue;
+
+            if (!wordTransitions.has(key)) wordTransitions.set(key, {});
+            const nextWords = wordTransitions.get(key);
+            nextWords[next] = (nextWords[next] || 0) + 1;
+        }
     }
-}
 
 // Normalisation
-for (const [key, nextWords] of wordTransitions.entries()) {
-    const total = Object.values(nextWords).reduce((a, b) => a + b, 0);
-    for (let word in nextWords) {
-        nextWords[word] /= total;
+    for (const [key, nextWords] of wordTransitions.entries()) {
+        const total = Object.values(nextWords).reduce((a, b) => a + b, 0);
+        for (let word in nextWords) {
+            nextWords[word] /= total;
+        }
     }
 }
-
 //  4. Chaîne de Markov sur les lettres
-const letterTransitions = {};
 
-for (let word of tokens) {
-    word += ' '; // espace = fin de mot
-    for (let i = 0; i < word.length - 1; i++) {
-        const curr = word[i];
-        const next = word[i + 1];
-        if (!letterTransitions[curr]) letterTransitions[curr] = {};
-        letterTransitions[curr][next] = (letterTransitions[curr][next] || 0) + 1;
+
+function markovLettre() {
+    const letterTransitions = {};
+    for (let word of tokens) {
+        word += ' '; // espace = fin de mot
+        for (let i = 0; i < word.length - 1; i++) {
+            const curr = word[i];
+            const next = word[i + 1];
+            if (!letterTransitions[curr]) letterTransitions[curr] = {};
+            letterTransitions[curr][next] = (letterTransitions[curr][next] || 0) + 1;
+        }
     }
-}
 
 // Normalisation
-for (let char in letterTransitions) {
-    const total = Object.values(letterTransitions[char]).reduce((a, b) => a + b, 0);
-    for (let next in letterTransitions[char]) {
-        letterTransitions[char][next] /= total;
+    for (let char in letterTransitions) {
+        const total = Object.values(letterTransitions[char]).reduce((a, b) => a + b, 0);
+        for (let next in letterTransitions[char]) {
+            letterTransitions[char][next] /= total;
+        }
     }
 }
-
 // 5. Fonctions de prédiction
 
 function getNextWordProbabilities(context) {
@@ -135,10 +139,10 @@ function predictNextLetterProbs(currentPrefix, options) {
 
 //  6. Interface interactive
 
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
+//const rl = readline.createInterface({
+//    input: process.stdin,
+//    output: process.stdout
+//});
 
 let phrase = [];
 let currentWord = '';
@@ -206,4 +210,4 @@ function askLetter() {
 
 console.log('\n--- Assistant de rédaction intelligent ---');
 console.log(' Tape chaque lettre, " " pour valider un mot, "stop" pour finir. \n');
-askLetter();
+//askLetter();
