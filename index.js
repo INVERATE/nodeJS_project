@@ -33,7 +33,7 @@ for (const [key, nextWords] of wordTransitions.entries()) {
     }
 }
 
-// === 4. Chaîne de Markov sur les lettres ===
+//  4. Chaîne de Markov sur les lettres
 const letterTransitions = {};
 
 for (let word of tokens) {
@@ -54,7 +54,7 @@ for (let char in letterTransitions) {
     }
 }
 
-// === 5. Fonctions de prédiction ===
+// 5. Fonctions de prédiction
 
 function getNextWordProbabilities(context) {
     for (let n = context.length; n > 0; n--) {
@@ -129,11 +129,11 @@ function predictNextLetterProbs(currentPrefix, options) {
     for (let l in letterProbs) {
         letterProbs[l] /= totalWeight;
     }
-
+    console.log(letterProbs);
     return letterProbs;
 }
 
-// === 6. Interface interactive ===
+//  6. Interface interactive
 
 const rl = readline.createInterface({
     input: process.stdin,
@@ -148,7 +148,7 @@ function askLetter() {
 
     rl.question(`Lettre (ou " " pour valider le mot, "stop" pour quitter) : `, function(input) {
         if (input === 'stop') {
-            console.log(`\n✅ Phrase finale : ${[...phrase, currentWord].join(' ')}`);
+            console.log(`\n Phrase finale : ${[...phrase, currentWord].join(' ')}`);
             rl.close();
             return;
         }
@@ -157,15 +157,15 @@ function askLetter() {
             if (currentWord.length > 0) {
                 phrase.push(currentWord);
                 currentWord = '';
-                console.log(`📌 Phrase : ${phrase.join(' ')}\n`);
+                console.log(` Phrase : ${phrase.join(' ')}\n`);
             }
 
             const { options, contextUsed } = getNextWordProbabilities(phrase);
             if (options) {
                 const predictions = Object.entries(options).sort((a, b) => b[1] - a[1]).slice(0, 3);
-                console.log(`🔮 Prochain(s) mot(s) possible(s) : ${predictions.map(([w, p]) => `${w} (${p.toFixed(2)})`).join(', ')}`);
+                console.log(` Prochain(s) mot(s) possible(s) : ${predictions.map(([w, p]) => `${w} (${p.toFixed(2)})`).join(', ')}`);
             } else {
-                console.log('❌ Aucune prédiction disponible pour ce contexte.');
+                console.log(' Aucune prédiction disponible pour ce contexte.');
             }
 
             askLetter();
@@ -183,7 +183,7 @@ function askLetter() {
         if (options) {
             const nextLetterProbs = predictNextLetterProbs(currentWord, options);
             if (Object.keys(nextLetterProbs).length > 0) {
-                console.log(`📈 Probabilités des prochaines lettres :`);
+                console.log(` Probabilités des prochaines lettres :`);
                 const sorted = Object.entries(nextLetterProbs)
                     .sort((a, b) => b[1] - a[1])
                     .map(([l, p]) => ({
@@ -192,18 +192,18 @@ function askLetter() {
                     }));
                 console.table(sorted);
             } else {
-                console.log(`❌ Aucune lettre probable à cette position`);
+                console.log(` Aucune lettre probable à cette position`);
             }
         } else {
             // fallback
             suggestion = predictLetterCompletion(currentWord);
         }
 
-        console.log(`✏️ Mot en cours : ${currentWord}${suggestion ? ` → ${currentWord + suggestion}` : ''}`);
+        console.log(` Mot en cours : ${currentWord}${suggestion ? ` → ${currentWord + suggestion}` : ''}`);
         askLetter();
     });
 }
 
-console.log('\n--- 🤖 Assistant de rédaction intelligent ---');
-console.log('💡 Tape chaque lettre, " " pour valider un mot, "stop" pour finir. \n');
+console.log('\n--- Assistant de rédaction intelligent ---');
+console.log(' Tape chaque lettre, " " pour valider un mot, "stop" pour finir. \n');
 askLetter();
