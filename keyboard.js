@@ -1,4 +1,6 @@
-import * as prediction from "./prediction.js"
+import * as prediction from "./predictionTest_v2.js"
+
+
 
 const Keyboard = {
     elements: {
@@ -199,10 +201,11 @@ const Keyboard = {
                             "click",
                             () => {
 
+                                const suggestion = prediction.predictLetterCompletion(this.keyElement);
                                 const keysToEnlarge = ["a", "e", "i"];
 
                                 this.elements.keys.forEach((keyEl) => {
-                                    if (keysToEnlarge.includes(keyEl.textContent.toLowerCase())) {
+                                    if (suggestion.includes(keyEl.textContent.toLowerCase())) {
                                         keyEl.classList.add("active");
                                     }
                                 });

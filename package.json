@@ -12,7 +12,7 @@
     "blessed": "^0.1.81"
   },
   "devDependencies": {
-    "electron": "^36.3.1",
+    "electron": "^36.3.2",
     "electron-reload": "^2.0.0-alpha.1"
   }
 }
