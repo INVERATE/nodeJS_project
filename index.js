@@ -1,9 +1,12 @@
+//chargement dans terminal long du a la longeur des textes
+
 import fs from 'fs';
 import readline from 'readline';
 
 // === 1. Lire le corpus ===
-const corpus = fs.readFileSync('./datasets/lacomediehumaine.txt', 'utf-8');
-
+const corpus1 = fs.readFileSync('./datasets/Proust.txt', 'utf-8');
+const corpus2 = fs.readFileSync('./datasets/lacomediehumaine.txt', 'utf-8');
+const corpus = corpus1 + corpus2
 // === 2. Tokenisation ===
 function tokenize(text) {
     return text.toLowerCase().replace(/[.,!?;:()"'-]/g, '').split(/\s+/);
@@ -12,7 +15,7 @@ const tokens = tokenize(corpus);
 
 // === 3. Chaîne de Markov sur les mots ===
 const wordTransitions = new Map();
-
+//on prend en comppte les 5 mot avant dans la phrase
 for (let n = 1; n <= 5; n++) {
     for (let i = 0; i <= tokens.length - n; i++) {
         const key = tokens.slice(i, i + n).join(' ');
