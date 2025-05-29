@@ -1,4 +1,14 @@
-import * as prediction from "./predictionTest_v2.js"
+const R = window?.R;
+const electronAPI = window?.electronAPI;
+
+
+import {
+    predictLetterCompletion,
+    predictNextLetterProbs,
+    getNextWordProbabilities,
+    loadMarkovData,
+    getMostProbableNextLetter,
+} from "./predictionTest_v2.js";
 
 
 
@@ -107,23 +117,20 @@ const Keyboard = {
         return `<span class="material-icons">${icon_name}</span>`;
     },
 
-    _createKeyBtn(iconName, class1, onclick, class2) {
-        this.keyElement =
-            document.createElement("button");
+    _createKeyBtn(iconName = "", class1 = "", onclick = () => {}, class2 = "") {
+        this.keyElement = document.createElement("button");
 
-        // add common attributes and classes
-        this.keyElement
-            .setAttribute("type", "button");
-        this.keyElement
-            .classList.add("keyboard__key");
+        this.keyElement.setAttribute("type", "button");
+        this.keyElement.classList.add("keyboard__key");
 
-        // add specific listeners and classes
-        this.keyElement
-            .classList.add(class1, class2);
-        this.keyElement.innerHTML =
-            this._createIconHTML(iconName);
-        this.keyElement
-            .addEventListener("click", onclick);
+        if (class1) this.keyElement.classList.add(class1);
+        if (class2) this.keyElement.classList.add(class2);
+
+        if (iconName) {
+            this.keyElement.innerHTML = this._createIconHTML(iconName);
+        }
+
+        this.keyElement.addEventListener("click", onclick);
     },
 
     _createKeys() {
@@ -191,32 +198,45 @@ const Keyboard = {
                     break;
 
                 default:
+                    this._createKeyBtn("", "", () => {
+                        // Ajout du caractère
+                        this.properties.value += this.properties.capsLock
+                            ? key.toUpperCase()
+                            : key.toLowerCase();
 
-                    this._createKeyBtn();
-                    this.keyElement.textContent =
-                        key.toLowerCase();
+                        this._updateValueInTarget();
 
-                    this.keyElement
-                        .addEventListener(
-                            "click",
-                            () => {
+                        // Trouver le mot actuel
+                        const currentValue = this.properties.value.trim().split(/\s+/);
+                        const lastWord = currentValue[currentValue.length - 1] || "";
 
-                                const suggestion = prediction.predictLetterCompletion(this.keyElement);
-                                const keysToEnlarge = ["a", "e", "i"];
+                        const context = currentValue.slice(0, -1); // ⚠️ important
+                        const { options } = getNextWordProbabilities(context);
 
-                                this.elements.keys.forEach((keyEl) => {
-                                    if (suggestion.includes(keyEl.textContent.toLowerCase())) {
-                                        keyEl.classList.add("active");
-                                    }
-                                });
+                        console.log("Valeur tapée :", this.properties.value);
+                        console.log("Mot en cours :", lastWord);
+                        console.log("Contexte :", context);
+                        console.log("Options:", options);
 
-                                this.properties.value +=
-                                    this.properties.capsLock
-                                        ? key.toUpperCase()
-                                        : key.toLowerCase();
-                                this._updateValueInTarget();
+
+                        if (options) {
+                            const suggestions = predictNextLetterProbs(lastWord, options);
+
+                            this.elements.keys.forEach((keyEl) => {
+                                const char = keyEl.textContent.toLowerCase();
+                                if (suggestions[char]) {
+                                    keyEl.classList.add("active"); // ou change la taille/style
+                                } else {
+                                    keyEl.classList.remove("active");
+                                }
                             });
+                        }
+                    });
+
+                    // Affichage de la lettre sur la touche
+                    this.keyElement.textContent = key.toLowerCase();
                     break;
+
             }
 
             fragment.appendChild(this.keyElement);
@@ -272,12 +292,29 @@ const Keyboard = {
 
 };
 
+import { setRamda, exampleRamdaUsage } from "./predictionTest_v2.js";
 
-window.addEventListener("DOMContentLoaded", function () {
+window.addEventListener("DOMContentLoaded", async () => {
+    await loadMarkovData();
+
+
+
+    if (window.R) {
+        console.log("hello");
+        setRamda(window.R);
+        exampleRamdaUsage(); // ✅ Ramda fonctionne
+    } else {
+        console.error("Ramda non chargé via preload.js !");
+        console.log(window.R);
+    }
+
+    if (electronAPI) {
+        electronAPI.envoyerMessage("Le clavier a été initialisé !");
+    } else {
+        console.error("❌ electronAPI non disponible !");
+    }
+
     Keyboard.init();
-
-    // Exemple : notifier le main process
-    window.electronAPI.envoyerMessage("Le clavier a été initialisé !");
 });
 
 

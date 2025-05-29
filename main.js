@@ -7,10 +7,11 @@ function createWindow() {
         height: 600,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
-            contextIsolation: false,
-            nodeIntegration: true
+            contextIsolation: true,
+            nodeIntegration: false
         }
     });
+
 
     win.loadFile('keyboard.html');
 }
@@ -28,6 +29,6 @@ app.on('window-all-closed', () => {
 });
 
 // Utilisation de ipcMain
-ipcMain.on('message-from-renderer', (event, arg) => {
+ipcMain.on('mon-message', (event, arg) => {
     console.log('Message reçu depuis le renderer:', arg);
 });

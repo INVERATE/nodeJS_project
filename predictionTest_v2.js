@@ -1,64 +1,29 @@
-import fs from 'fs';
+let R = null;
 
-// 1. Lire le corpus
-const corpus = fs.readFileSync('./datasets/lacomediehumaine.txt', 'utf-8');
-
-// 2. Tokenisation
-function tokenize(text) {
-    return text.toLowerCase().replace(/[.,!?;:()"'-]/g, '').split(/\s+/);
-}
-const tokens = tokenize(corpus);
-
-// 3. Chaîne de Markov sur les mots
-const wordTransitions = new Map();
-
-for (let n = 1; n <= 5; n++) {
-    for (let i = 0; i <= tokens.length - n; i++) {
-        const key = tokens.slice(i, i + n).join(' ');
-        const next = tokens[i + n];
-        if (!next) continue;
-
-        if (!wordTransitions.has(key)) wordTransitions.set(key, {});
-        const nextWords = wordTransitions.get(key);
-        nextWords[next] = (nextWords[next] || 0) + 1;
-    }
+export function setRamda(ramdaLib) {
+    R = ramdaLib;
 }
 
-// Normalisation des mots
-for (const [key, nextWords] of wordTransitions.entries()) {
-    const total = Object.values(nextWords).reduce((a, b) => a + b, 0);
-    for (let word in nextWords) {
-        nextWords[word] /= total;
-    }
+// Exemple d'utilisation
+export function exampleRamdaUsage() {
+    const data = [1, 2, 3, 4];
+    const squared = R.map(x => x * x, data);
+    console.log(squared); // [1, 4, 9, 16]
 }
+let wordTransitions = {};
+let letterTransitions = {};
 
-// 4. Chaîne de Markov sur les lettres
-const letterTransitions = {};
-
-for (let word of tokens) {
-    word += ' ';
-    for (let i = 0; i < word.length - 1; i++) {
-        const curr = word[i];
-        const next = word[i + 1];
-        if (!letterTransitions[curr]) letterTransitions[curr] = {};
-        letterTransitions[curr][next] = (letterTransitions[curr][next] || 0) + 1;
-    }
+export async function loadMarkovData() {
+    const wordRes = await fetch('./markov_word_transitions.json');
+    const letterRes = await fetch('./markov_letter_transitions.json');
+    wordTransitions = await wordRes.json();
+    letterTransitions = await letterRes.json();
 }
-
-// Normalisation des lettres
-for (let char in letterTransitions) {
-    const total = Object.values(letterTransitions[char]).reduce((a, b) => a + b, 0);
-    for (let next in letterTransitions[char]) {
-        letterTransitions[char][next] /= total;
-    }
-}
-
-// Fonctions exportables
 
 export function getNextWordProbabilities(context) {
     for (let n = context.length; n > 0; n--) {
         const key = context.slice(-n).join(' ');
-        const options = wordTransitions.get(key);
+        const options = wordTransitions[key];
         if (options) return { options, contextUsed: n };
     }
     return { options: null, contextUsed: 0 };
@@ -123,9 +88,26 @@ export function predictNextLetterProbs(currentPrefix, options) {
         letterProbs[nextLetter] += wordProb;
     }
 
+    // Normalisation
     for (let l in letterProbs) {
         letterProbs[l] /= totalWeight;
     }
-
+    console.log(letterProbs);
     return letterProbs;
+}
+
+export function getMostProbableNextLetter(currentPrefix, options) {
+    const letterProbs = predictNextLetterProbs(currentPrefix, options);
+
+    let bestLetter = null;
+    let bestProb = 0;
+
+    for (let letter in letterProbs) {
+        if (letterProbs[letter] > bestProb) {
+            bestProb = letterProbs[letter];
+            bestLetter = letter;
+        }
+    }
+
+    return bestLetter;
 }
