@@ -3,25 +3,88 @@
 <html lang="en">
 
 <head>
-    <meta name="viewport"
-          content="width=device-width,
-		initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="keyboard.css" />
-    <link href=
-                  "https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
-    <title>
-        Virtual Keyboard
-    </title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <title>Virtual Keyboard</title>
+    <style>
+        /* Style pour centrer le loader */
+        #loader {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        /* On cache le contenu principal au début */
+        #content {
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
-<textarea name="anytext"
-          class="text-area use-keyboard-input"
-          placeholder="">
-	</textarea>
+<style>
+    #loader {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        gap: 8px;
+    }
+
+    #loader .material-icons {
+        animation: spin 1s linear infinite;
+        font-size: 48px;
+    }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    #loader p {
+        font-family: verdana, sans-serif;
+        margin: 0;
+    }
+</style>
+
+<div id="loader">
+    <span class="material-icons">autorenew</span>
+    <p>Chargement...</p>
+</div>
+
+
+<div id="content">
+    <textarea name="anytext" class="text-area use-keyboard-input" placeholder=""></textarea>
+</div>
+
 <script type="module" src="dist/renderer.bundle.js"></script>
+
+<script>
+    // Animation CSS en JS, pour tourner l'icône Material Icons
+    const style = document.createElement('style');
+    style.textContent = `
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `;
+    document.head.appendChild(style);
+
+    window.onload = () => {
+        // Ici tu peux faire des actions en attente, charger des données etc.
+        // Pour l'exemple, on simule un chargement avec setTimeout
+        setTimeout(() => {
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+        }, 2000); // 2 secondes de chargement simulé
+    };
+</script>
 </body>
 
 </html>
-
-
