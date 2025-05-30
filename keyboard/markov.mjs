@@ -22,7 +22,7 @@ const corpus = corpus1 + corpus2 + corpus3 + corpus5 ;
 // === 2. Tokenisation ===
 function tokenize(text) {
     return R.split(/\s+/,
-        R.replace(/[.,!?;:()"'-]/g, '',
+        R.replace(/[.?()"'-]/g, ' ',
             R.toLower(text)));
 }
 
@@ -30,9 +30,9 @@ const tokens = tokenize(corpus);
 
 // === 3. Chaîne de Markov sur les mots ===
 const wordTransitions = new Map();
-//on prend en comppte les 5 mot avant dans la phrase
-for (let n = 1; n <= 5; n++) {
-    for (let i = 0; i <= R.length(tokens) - n; i++) {
+//on prend en compte les 5 mots avant dans la phrase
+for (let n = 1; n <= 2; n++) {
+    for (let i = 0; i <= tokens.length - n - 1; i++) {
         const key = R.join(' ', R.slice(i, i + n, tokens));
         const next = tokens[i + n];
         if (!next) continue;

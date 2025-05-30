@@ -1,10 +1,10 @@
 (() => {
-  // ../node_modules/ramda/es/internal/_isPlaceholder.js
+  // node_modules/ramda/es/internal/_isPlaceholder.js
   function _isPlaceholder(a) {
     return a != null && typeof a === "object" && a["@@functional/placeholder"] === true;
   }
 
-  // ../node_modules/ramda/es/internal/_curry1.js
+  // node_modules/ramda/es/internal/_curry1.js
   function _curry1(fn) {
     return function f1(a) {
       if (arguments.length === 0 || _isPlaceholder(a)) {
@@ -15,7 +15,7 @@
     };
   }
 
-  // ../node_modules/ramda/es/internal/_curry2.js
+  // node_modules/ramda/es/internal/_curry2.js
   function _curry2(fn) {
     return function f2(a, b) {
       switch (arguments.length) {
@@ -35,7 +35,7 @@
     };
   }
 
-  // ../node_modules/ramda/es/internal/_arity.js
+  // node_modules/ramda/es/internal/_arity.js
   function _arity(n, fn) {
     switch (n) {
       case 0:
@@ -87,41 +87,7 @@
     }
   }
 
-  // ../node_modules/ramda/es/internal/_curryN.js
-  function _curryN(length3, received, fn) {
-    return function() {
-      var combined = [];
-      var argsIdx = 0;
-      var left = length3;
-      var combinedIdx = 0;
-      while (combinedIdx < received.length || argsIdx < arguments.length) {
-        var result;
-        if (combinedIdx < received.length && (!_isPlaceholder(received[combinedIdx]) || argsIdx >= arguments.length)) {
-          result = received[combinedIdx];
-        } else {
-          result = arguments[argsIdx];
-          argsIdx += 1;
-        }
-        combined[combinedIdx] = result;
-        if (!_isPlaceholder(result)) {
-          left -= 1;
-        }
-        combinedIdx += 1;
-      }
-      return left <= 0 ? fn.apply(this, combined) : _arity(left, _curryN(length3, combined, fn));
-    };
-  }
-
-  // ../node_modules/ramda/es/curryN.js
-  var curryN = /* @__PURE__ */ _curry2(function curryN2(length3, fn) {
-    if (length3 === 1) {
-      return _curry1(fn);
-    }
-    return _arity(length3, _curryN(length3, [], fn));
-  });
-  var curryN_default = curryN;
-
-  // ../node_modules/ramda/es/internal/_curry3.js
+  // node_modules/ramda/es/internal/_curry3.js
   function _curry3(fn) {
     return function f3(a, b, c) {
       switch (arguments.length) {
@@ -157,77 +123,17 @@
     };
   }
 
-  // ../node_modules/ramda/es/internal/_isArray.js
+  // node_modules/ramda/es/internal/_isArray.js
   var isArray_default = Array.isArray || function _isArray(val) {
     return val != null && val.length >= 0 && Object.prototype.toString.call(val) === "[object Array]";
   };
 
-  // ../node_modules/ramda/es/internal/_isTransformer.js
-  function _isTransformer(obj) {
-    return obj != null && typeof obj["@@transducer/step"] === "function";
-  }
-
-  // ../node_modules/ramda/es/internal/_dispatchable.js
-  function _dispatchable(methodNames, xf, fn) {
-    return function() {
-      if (arguments.length === 0) {
-        return fn();
-      }
-      var args = Array.prototype.slice.call(arguments, 0);
-      var obj = args.pop();
-      if (!isArray_default(obj)) {
-        var idx = 0;
-        while (idx < methodNames.length) {
-          if (typeof obj[methodNames[idx]] === "function") {
-            return obj[methodNames[idx]].apply(obj, args);
-          }
-          idx += 1;
-        }
-        if (_isTransformer(obj)) {
-          var transducer = xf.apply(null, args);
-          return transducer(obj);
-        }
-      }
-      return fn.apply(this, arguments);
-    };
-  }
-
-  // ../node_modules/ramda/es/internal/_reduced.js
-  function _reduced(x) {
-    return x && x["@@transducer/reduced"] ? x : {
-      "@@transducer/value": x,
-      "@@transducer/reduced": true
-    };
-  }
-
-  // ../node_modules/ramda/es/internal/_xfBase.js
-  var xfBase_default = {
-    init: function() {
-      return this.xf["@@transducer/init"]();
-    },
-    result: function(result) {
-      return this.xf["@@transducer/result"](result);
-    }
-  };
-
-  // ../node_modules/ramda/es/internal/_map.js
-  function _map(fn, functor) {
-    var idx = 0;
-    var len = functor.length;
-    var result = Array(len);
-    while (idx < len) {
-      result[idx] = fn(functor[idx]);
-      idx += 1;
-    }
-    return result;
-  }
-
-  // ../node_modules/ramda/es/internal/_isString.js
+  // node_modules/ramda/es/internal/_isString.js
   function _isString(x) {
     return Object.prototype.toString.call(x) === "[object String]";
   }
 
-  // ../node_modules/ramda/es/internal/_isArrayLike.js
+  // node_modules/ramda/es/internal/_isArrayLike.js
   var _isArrayLike = /* @__PURE__ */ _curry1(function isArrayLike(x) {
     if (isArray_default(x)) {
       return true;
@@ -254,7 +160,7 @@
   });
   var isArrayLike_default = _isArrayLike;
 
-  // ../node_modules/ramda/es/internal/_xwrap.js
+  // node_modules/ramda/es/internal/_xwrap.js
   var XWrap = /* @__PURE__ */ function() {
     function XWrap2(fn) {
       this.f = fn;
@@ -274,7 +180,7 @@
     return new XWrap(fn);
   }
 
-  // ../node_modules/ramda/es/bind.js
+  // node_modules/ramda/es/bind.js
   var bind = /* @__PURE__ */ _curry2(function bind2(fn, thisObj) {
     return _arity(fn.length, function() {
       return fn.apply(thisObj, arguments);
@@ -282,7 +188,7 @@
   });
   var bind_default = bind;
 
-  // ../node_modules/ramda/es/internal/_reduce.js
+  // node_modules/ramda/es/internal/_reduce.js
   function _arrayReduce(xf, acc, list) {
     var idx = 0;
     var len = list.length;
@@ -334,12 +240,12 @@
     throw new TypeError("reduce: list must be array or iterable");
   }
 
-  // ../node_modules/ramda/es/internal/_has.js
-  function _has(prop, obj) {
-    return Object.prototype.hasOwnProperty.call(obj, prop);
+  // node_modules/ramda/es/internal/_has.js
+  function _has(prop3, obj) {
+    return Object.prototype.hasOwnProperty.call(obj, prop3);
   }
 
-  // ../node_modules/ramda/es/internal/_isArguments.js
+  // node_modules/ramda/es/internal/_isArguments.js
   var toString = Object.prototype.toString;
   var _isArguments = /* @__PURE__ */ function() {
     return toString.call(arguments) === "[object Arguments]" ? function _isArguments2(x) {
@@ -350,7 +256,7 @@
   }();
   var isArguments_default = _isArguments;
 
-  // ../node_modules/ramda/es/keys.js
+  // node_modules/ramda/es/keys.js
   var hasEnumBug = !/* @__PURE__ */ {
     toString: null
   }.propertyIsEnumerable("toString");
@@ -375,20 +281,20 @@
     if (Object(obj) !== obj) {
       return [];
     }
-    var prop, nIdx;
+    var prop3, nIdx;
     var ks = [];
     var checkArgsLength = hasArgsEnumBug && isArguments_default(obj);
-    for (prop in obj) {
-      if (_has(prop, obj) && (!checkArgsLength || prop !== "length")) {
-        ks[ks.length] = prop;
+    for (prop3 in obj) {
+      if (_has(prop3, obj) && (!checkArgsLength || prop3 !== "length")) {
+        ks[ks.length] = prop3;
       }
     }
     if (hasEnumBug) {
       nIdx = nonEnumerableProps.length - 1;
       while (nIdx >= 0) {
-        prop = nonEnumerableProps[nIdx];
-        if (_has(prop, obj) && !contains(ks, prop)) {
-          ks[ks.length] = prop;
+        prop3 = nonEnumerableProps[nIdx];
+        if (_has(prop3, obj) && !contains(ks, prop3)) {
+          ks[ks.length] = prop3;
         }
         nIdx -= 1;
       }
@@ -397,42 +303,73 @@
   });
   var keys_default = keys;
 
-  // ../node_modules/ramda/es/reduce.js
+  // node_modules/ramda/es/internal/_isInteger.js
+  var isInteger_default = Number.isInteger || function _isInteger(n) {
+    return n << 0 === n;
+  };
+
+  // node_modules/ramda/es/nth.js
+  var nth = /* @__PURE__ */ _curry2(function nth2(offset, list) {
+    var idx = offset < 0 ? list.length + offset : offset;
+    return _isString(list) ? list.charAt(idx) : list[idx];
+  });
+  var nth_default = nth;
+
+  // node_modules/ramda/es/paths.js
+  var paths = /* @__PURE__ */ _curry2(function paths2(pathsArray, obj) {
+    return pathsArray.map(function(paths3) {
+      var val = obj;
+      var idx = 0;
+      var p;
+      while (idx < paths3.length) {
+        if (val == null) {
+          return;
+        }
+        p = paths3[idx];
+        val = isInteger_default(p) ? nth_default(p, val) : val[p];
+        idx += 1;
+      }
+      return val;
+    });
+  });
+  var paths_default = paths;
+
+  // node_modules/ramda/es/path.js
+  var path = /* @__PURE__ */ _curry2(function path2(pathAr, obj) {
+    return paths_default([pathAr], obj)[0];
+  });
+  var path_default = path;
+
+  // node_modules/ramda/es/prop.js
+  var prop = /* @__PURE__ */ _curry2(function prop2(p, obj) {
+    return path_default([p], obj);
+  });
+  var prop_default = prop;
+
+  // node_modules/ramda/es/reduce.js
   var reduce = /* @__PURE__ */ _curry3(_reduce);
   var reduce_default = reduce;
 
-  // ../node_modules/ramda/es/internal/_isFunction.js
-  function _isFunction(x) {
-    var type3 = Object.prototype.toString.call(x);
-    return type3 === "[object Function]" || type3 === "[object AsyncFunction]" || type3 === "[object GeneratorFunction]" || type3 === "[object AsyncGeneratorFunction]";
-  }
-
-  // ../node_modules/ramda/es/type.js
-  var type = /* @__PURE__ */ _curry1(function type2(val) {
-    return val === null ? "Null" : val === void 0 ? "Undefined" : Object.prototype.toString.call(val).slice(8, -1);
-  });
-  var type_default = type;
-
-  // ../node_modules/ramda/es/internal/_pipe.js
+  // node_modules/ramda/es/internal/_pipe.js
   function _pipe(f, g) {
     return function() {
       return g.call(this, f.apply(this, arguments));
     };
   }
 
-  // ../node_modules/ramda/es/internal/_checkForMethod.js
+  // node_modules/ramda/es/internal/_checkForMethod.js
   function _checkForMethod(methodname, fn) {
     return function() {
-      var length3 = arguments.length;
-      if (length3 === 0) {
+      var length = arguments.length;
+      if (length === 0) {
         return fn();
       }
-      var obj = arguments[length3 - 1];
-      return isArray_default(obj) || typeof obj[methodname] !== "function" ? fn.apply(this, arguments) : obj[methodname].apply(obj, Array.prototype.slice.call(arguments, 0, length3 - 1));
+      var obj = arguments[length - 1];
+      return isArray_default(obj) || typeof obj[methodname] !== "function" ? fn.apply(this, arguments) : obj[methodname].apply(obj, Array.prototype.slice.call(arguments, 0, length - 1));
     };
   }
 
-  // ../node_modules/ramda/es/slice.js
+  // node_modules/ramda/es/slice.js
   var slice = /* @__PURE__ */ _curry3(
     /* @__PURE__ */ _checkForMethod("slice", function slice2(fromIndex, toIndex, list) {
       return Array.prototype.slice.call(list, fromIndex, toIndex);
@@ -440,7 +377,7 @@
   );
   var slice_default = slice;
 
-  // ../node_modules/ramda/es/tail.js
+  // node_modules/ramda/es/tail.js
   var tail = /* @__PURE__ */ _curry1(
     /* @__PURE__ */ _checkForMethod(
       "tail",
@@ -449,7 +386,7 @@
   );
   var tail_default = tail;
 
-  // ../node_modules/ramda/es/pipe.js
+  // node_modules/ramda/es/pipe.js
   function pipe() {
     if (arguments.length === 0) {
       throw new Error("pipe requires at least one argument");
@@ -457,527 +394,83 @@
     return _arity(arguments[0].length, reduce_default(_pipe, arguments[0], tail_default(arguments)));
   }
 
-  // ../node_modules/ramda/es/internal/_arrayFromIterator.js
-  function _arrayFromIterator(iter) {
-    var list = [];
-    var next;
-    while (!(next = iter.next()).done) {
-      list.push(next.value);
-    }
-    return list;
-  }
-
-  // ../node_modules/ramda/es/internal/_includesWith.js
-  function _includesWith(pred, x, list) {
-    var idx = 0;
-    var len = list.length;
-    while (idx < len) {
-      if (pred(x, list[idx])) {
-        return true;
-      }
-      idx += 1;
-    }
-    return false;
-  }
-
-  // ../node_modules/ramda/es/internal/_functionName.js
-  function _functionName(f) {
-    var match = String(f).match(/^function (\w*)/);
-    return match == null ? "" : match[1];
-  }
-
-  // ../node_modules/ramda/es/internal/_objectIs.js
-  function _objectIs(a, b) {
-    if (a === b) {
-      return a !== 0 || 1 / a === 1 / b;
-    } else {
-      return a !== a && b !== b;
-    }
-  }
-  var objectIs_default = typeof Object.is === "function" ? Object.is : _objectIs;
-
-  // ../node_modules/ramda/es/internal/_equals.js
-  function _uniqContentEquals(aIterator, bIterator, stackA, stackB) {
-    var a = _arrayFromIterator(aIterator);
-    var b = _arrayFromIterator(bIterator);
-    function eq(_a, _b) {
-      return _equals(_a, _b, stackA.slice(), stackB.slice());
-    }
-    return !_includesWith(function(b2, aItem) {
-      return !_includesWith(eq, aItem, b2);
-    }, b, a);
-  }
-  function _equals(a, b, stackA, stackB) {
-    if (objectIs_default(a, b)) {
-      return true;
-    }
-    var typeA = type_default(a);
-    if (typeA !== type_default(b)) {
-      return false;
-    }
-    if (a == null || b == null) {
-      return false;
-    }
-    if (typeof a["fantasy-land/equals"] === "function" || typeof b["fantasy-land/equals"] === "function") {
-      return typeof a["fantasy-land/equals"] === "function" && a["fantasy-land/equals"](b) && typeof b["fantasy-land/equals"] === "function" && b["fantasy-land/equals"](a);
-    }
-    if (typeof a.equals === "function" || typeof b.equals === "function") {
-      return typeof a.equals === "function" && a.equals(b) && typeof b.equals === "function" && b.equals(a);
-    }
-    switch (typeA) {
-      case "Arguments":
-      case "Array":
-      case "Object":
-        if (typeof a.constructor === "function" && _functionName(a.constructor) === "Promise") {
-          return a === b;
-        }
-        break;
-      case "Boolean":
-      case "Number":
-      case "String":
-        if (!(typeof a === typeof b && objectIs_default(a.valueOf(), b.valueOf()))) {
-          return false;
-        }
-        break;
-      case "Date":
-        if (!objectIs_default(a.valueOf(), b.valueOf())) {
-          return false;
-        }
-        break;
-      case "Error":
-        return a.name === b.name && a.message === b.message;
-      case "RegExp":
-        if (!(a.source === b.source && a.global === b.global && a.ignoreCase === b.ignoreCase && a.multiline === b.multiline && a.sticky === b.sticky && a.unicode === b.unicode)) {
-          return false;
-        }
-        break;
-    }
-    var idx = stackA.length - 1;
-    while (idx >= 0) {
-      if (stackA[idx] === a) {
-        return stackB[idx] === b;
-      }
-      idx -= 1;
-    }
-    switch (typeA) {
-      case "Map":
-        if (a.size !== b.size) {
-          return false;
-        }
-        return _uniqContentEquals(a.entries(), b.entries(), stackA.concat([a]), stackB.concat([b]));
-      case "Set":
-        if (a.size !== b.size) {
-          return false;
-        }
-        return _uniqContentEquals(a.values(), b.values(), stackA.concat([a]), stackB.concat([b]));
-      case "Arguments":
-      case "Array":
-      case "Object":
-      case "Boolean":
-      case "Number":
-      case "String":
-      case "Date":
-      case "Error":
-      case "RegExp":
-      case "Int8Array":
-      case "Uint8Array":
-      case "Uint8ClampedArray":
-      case "Int16Array":
-      case "Uint16Array":
-      case "Int32Array":
-      case "Uint32Array":
-      case "Float32Array":
-      case "Float64Array":
-      case "ArrayBuffer":
-        break;
-      default:
-        return false;
-    }
-    var keysA = keys_default(a);
-    if (keysA.length !== keys_default(b).length) {
-      return false;
-    }
-    var extendedStackA = stackA.concat([a]);
-    var extendedStackB = stackB.concat([b]);
-    idx = keysA.length - 1;
-    while (idx >= 0) {
-      var key = keysA[idx];
-      if (!(_has(key, b) && _equals(b[key], a[key], extendedStackA, extendedStackB))) {
-        return false;
-      }
-      idx -= 1;
-    }
-    return true;
-  }
-
-  // ../node_modules/ramda/es/equals.js
-  var equals = /* @__PURE__ */ _curry2(function equals2(a, b) {
-    return _equals(a, b, [], []);
+  // node_modules/ramda/es/reverse.js
+  var reverse = /* @__PURE__ */ _curry1(function reverse2(list) {
+    return _isString(list) ? list.split("").reverse().join("") : Array.prototype.slice.call(list, 0).reverse();
   });
-  var equals_default = equals;
+  var reverse_default = reverse;
 
-  // ../node_modules/ramda/es/internal/_indexOf.js
-  function _indexOf(list, a, idx) {
-    var inf, item;
-    if (typeof list.indexOf === "function") {
-      switch (typeof a) {
-        case "number":
-          if (a === 0) {
-            inf = 1 / a;
-            while (idx < list.length) {
-              item = list[idx];
-              if (item === 0 && 1 / item === inf) {
-                return idx;
-              }
-              idx += 1;
-            }
-            return -1;
-          } else if (a !== a) {
-            while (idx < list.length) {
-              item = list[idx];
-              if (typeof item === "number" && item !== item) {
-                return idx;
-              }
-              idx += 1;
-            }
-            return -1;
-          }
-          return list.indexOf(a, idx);
-        // all these types can utilise Set
-        case "string":
-        case "boolean":
-        case "function":
-        case "undefined":
-          return list.indexOf(a, idx);
-        case "object":
-          if (a === null) {
-            return list.indexOf(a, idx);
-          }
-      }
-    }
-    while (idx < list.length) {
-      if (equals_default(list[idx], a)) {
-        return idx;
-      }
-      idx += 1;
-    }
-    return -1;
-  }
-
-  // ../node_modules/ramda/es/internal/_includes.js
-  function _includes(a, list) {
-    return _indexOf(list, a, 0) >= 0;
-  }
-
-  // ../node_modules/ramda/es/internal/_quote.js
-  function _quote(s) {
-    var escaped = s.replace(/\\/g, "\\\\").replace(/[\b]/g, "\\b").replace(/\f/g, "\\f").replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\t/g, "\\t").replace(/\v/g, "\\v").replace(/\0/g, "\\0");
-    return '"' + escaped.replace(/"/g, '\\"') + '"';
-  }
-
-  // ../node_modules/ramda/es/internal/_toISOString.js
-  var pad = function pad2(n) {
-    return (n < 10 ? "0" : "") + n;
-  };
-  var _toISOString = typeof Date.prototype.toISOString === "function" ? function _toISOString2(d) {
-    return d.toISOString();
-  } : function _toISOString3(d) {
-    return d.getUTCFullYear() + "-" + pad(d.getUTCMonth() + 1) + "-" + pad(d.getUTCDate()) + "T" + pad(d.getUTCHours()) + ":" + pad(d.getUTCMinutes()) + ":" + pad(d.getUTCSeconds()) + "." + (d.getUTCMilliseconds() / 1e3).toFixed(3).slice(2, 5) + "Z";
-  };
-  var toISOString_default = _toISOString;
-
-  // ../node_modules/ramda/es/internal/_complement.js
-  function _complement(f) {
-    return function() {
-      return !f.apply(this, arguments);
-    };
-  }
-
-  // ../node_modules/ramda/es/internal/_filter.js
-  function _filter(fn, list) {
+  // node_modules/ramda/es/fromPairs.js
+  var fromPairs = /* @__PURE__ */ _curry1(function fromPairs2(pairs) {
+    var result = {};
     var idx = 0;
-    var len = list.length;
-    var result = [];
-    while (idx < len) {
-      if (fn(list[idx])) {
-        result[result.length] = list[idx];
-      }
+    while (idx < pairs.length) {
+      result[pairs[idx][0]] = pairs[idx][1];
       idx += 1;
     }
     return result;
-  }
-
-  // ../node_modules/ramda/es/internal/_isObject.js
-  function _isObject(x) {
-    return Object.prototype.toString.call(x) === "[object Object]";
-  }
-
-  // ../node_modules/ramda/es/internal/_xfilter.js
-  var XFilter = /* @__PURE__ */ function() {
-    function XFilter2(f, xf) {
-      this.xf = xf;
-      this.f = f;
-    }
-    XFilter2.prototype["@@transducer/init"] = xfBase_default.init;
-    XFilter2.prototype["@@transducer/result"] = xfBase_default.result;
-    XFilter2.prototype["@@transducer/step"] = function(result, input) {
-      return this.f(input) ? this.xf["@@transducer/step"](result, input) : result;
-    };
-    return XFilter2;
-  }();
-  var _xfilter = /* @__PURE__ */ _curry2(function _xfilter2(f, xf) {
-    return new XFilter(f, xf);
   });
-  var xfilter_default = _xfilter;
+  var fromPairs_default = fromPairs;
 
-  // ../node_modules/ramda/es/filter.js
-  var filter = /* @__PURE__ */ _curry2(
-    /* @__PURE__ */ _dispatchable(["filter"], xfilter_default, function(pred, filterable) {
-      return _isObject(filterable) ? _reduce(function(acc, key) {
-        if (pred(filterable[key])) {
-          acc[key] = filterable[key];
-        }
-        return acc;
-      }, {}, keys_default(filterable)) : (
-        // else
-        _filter(pred, filterable)
-      );
-    })
-  );
-  var filter_default = filter;
-
-  // ../node_modules/ramda/es/reject.js
-  var reject = /* @__PURE__ */ _curry2(function reject2(pred, filterable) {
-    return filter_default(_complement(pred), filterable);
+  // node_modules/ramda/es/mapObjIndexed.js
+  var mapObjIndexed = /* @__PURE__ */ _curry2(function mapObjIndexed2(fn, obj) {
+    return _reduce(function(acc, key) {
+      acc[key] = fn(obj[key], key, obj);
+      return acc;
+    }, {}, keys_default(obj));
   });
-  var reject_default = reject;
+  var mapObjIndexed_default = mapObjIndexed;
 
-  // ../node_modules/ramda/es/internal/_toString.js
-  function _toString(x, seen) {
-    var recur = function recur2(y) {
-      var xs = seen.concat([x]);
-      return _includes(y, xs) ? "<Circular>" : _toString(y, xs);
-    };
-    var mapPairs = function(obj, keys4) {
-      return _map(function(k) {
-        return _quote(k) + ": " + recur(obj[k]);
-      }, keys4.slice().sort());
-    };
-    switch (Object.prototype.toString.call(x)) {
-      case "[object Arguments]":
-        return "(function() { return arguments; }(" + _map(recur, x).join(", ") + "))";
-      case "[object Array]":
-        return "[" + _map(recur, x).concat(mapPairs(x, reject_default(function(k) {
-          return /^\d+$/.test(k);
-        }, keys_default(x)))).join(", ") + "]";
-      case "[object Boolean]":
-        return typeof x === "object" ? "new Boolean(" + recur(x.valueOf()) + ")" : x.toString();
-      case "[object Date]":
-        return "new Date(" + (isNaN(x.valueOf()) ? recur(NaN) : _quote(toISOString_default(x))) + ")";
-      case "[object Null]":
-        return "null";
-      case "[object Number]":
-        return typeof x === "object" ? "new Number(" + recur(x.valueOf()) + ")" : 1 / x === -Infinity ? "-0" : x.toString(10);
-      case "[object String]":
-        return typeof x === "object" ? "new String(" + recur(x.valueOf()) + ")" : _quote(x);
-      case "[object Undefined]":
-        return "undefined";
-      default:
-        if (typeof x.toString === "function") {
-          var repr = x.toString();
-          if (repr !== "[object Object]") {
-            return repr;
-          }
-        }
-        return "{" + mapPairs(x, keys_default(x)).join(", ") + "}";
-    }
-  }
-
-  // ../node_modules/ramda/es/toString.js
-  var toString2 = /* @__PURE__ */ _curry1(function toString3(val) {
-    return _toString(val, []);
-  });
-  var toString_default = toString2;
-
-  // ../node_modules/ramda/es/internal/_xdrop.js
-  var XDrop = /* @__PURE__ */ function() {
-    function XDrop2(n, xf) {
-      this.xf = xf;
-      this.n = n;
-    }
-    XDrop2.prototype["@@transducer/init"] = xfBase_default.init;
-    XDrop2.prototype["@@transducer/result"] = xfBase_default.result;
-    XDrop2.prototype["@@transducer/step"] = function(result, input) {
-      if (this.n > 0) {
-        this.n -= 1;
-        return result;
-      }
-      return this.xf["@@transducer/step"](result, input);
-    };
-    return XDrop2;
-  }();
-  var _xdrop = /* @__PURE__ */ _curry2(function _xdrop2(n, xf) {
-    return new XDrop(n, xf);
-  });
-  var xdrop_default = _xdrop;
-
-  // ../node_modules/ramda/es/drop.js
-  var drop = /* @__PURE__ */ _curry2(
-    /* @__PURE__ */ _dispatchable(["drop"], xdrop_default, function drop2(n, xs) {
-      return slice_default(Math.max(0, n), Infinity, xs);
-    })
-  );
-  var drop_default = drop;
-
-  // ../node_modules/ramda/es/internal/_xtake.js
-  var XTake = /* @__PURE__ */ function() {
-    function XTake2(n, xf) {
-      this.xf = xf;
-      this.n = n;
-      this.i = 0;
-    }
-    XTake2.prototype["@@transducer/init"] = xfBase_default.init;
-    XTake2.prototype["@@transducer/result"] = xfBase_default.result;
-    XTake2.prototype["@@transducer/step"] = function(result, input) {
-      this.i += 1;
-      var ret = this.n === 0 ? result : this.xf["@@transducer/step"](result, input);
-      return this.n >= 0 && this.i >= this.n ? _reduced(ret) : ret;
-    };
-    return XTake2;
-  }();
-  var _xtake = /* @__PURE__ */ _curry2(function _xtake2(n, xf) {
-    return new XTake(n, xf);
-  });
-  var xtake_default = _xtake;
-
-  // ../node_modules/ramda/es/take.js
-  var take = /* @__PURE__ */ _curry2(
-    /* @__PURE__ */ _dispatchable(["take"], xtake_default, function take2(n, xs) {
-      return slice_default(0, n < 0 ? Infinity : n, xs);
-    })
-  );
-  var take_default = take;
-
-  // ../node_modules/ramda/es/takeLast.js
-  var takeLast = /* @__PURE__ */ _curry2(function takeLast2(n, xs) {
-    return drop_default(n >= 0 ? xs.length - n : 0, xs);
-  });
-  var takeLast_default = takeLast;
-
-  // ../node_modules/ramda/es/invoker.js
-  var invoker = /* @__PURE__ */ _curry2(function invoker2(arity, method) {
-    return curryN_default(arity + 1, function() {
-      var target = arguments[arity];
-      if (target != null && _isFunction(target[method])) {
-        return target[method].apply(target, Array.prototype.slice.call(arguments, 0, arity));
-      }
-      throw new TypeError(toString_default(target) + ' does not have a method named "' + method + '"');
+  // node_modules/ramda/es/sortBy.js
+  var sortBy = /* @__PURE__ */ _curry2(function sortBy2(fn, list) {
+    return Array.prototype.slice.call(list, 0).sort(function(a, b) {
+      var aa = fn(a);
+      var bb = fn(b);
+      return aa < bb ? -1 : aa > bb ? 1 : 0;
     });
   });
-  var invoker_default = invoker;
+  var sortBy_default = sortBy;
 
-  // ../node_modules/ramda/es/join.js
-  var join = /* @__PURE__ */ invoker_default(1, "join");
-  var join_default = join;
-
-  // ../node_modules/ramda/es/internal/_isNumber.js
-  function _isNumber(x) {
-    return Object.prototype.toString.call(x) === "[object Number]";
-  }
-
-  // ../node_modules/ramda/es/length.js
-  var length = /* @__PURE__ */ _curry1(function length2(list) {
-    return list != null && _isNumber(list.length) ? list.length : NaN;
+  // node_modules/ramda/es/toPairs.js
+  var toPairs = /* @__PURE__ */ _curry1(function toPairs2(obj) {
+    var pairs = [];
+    for (var prop3 in obj) {
+      if (_has(prop3, obj)) {
+        pairs[pairs.length] = [prop3, obj[prop3]];
+      }
+    }
+    return pairs;
   });
-  var length_default = length;
-
-  // ../node_modules/ramda/es/startsWith.js
-  var startsWith = /* @__PURE__ */ _curry2(function(prefix, list) {
-    return equals_default(take_default(prefix.length, list), prefix);
-  });
-  var startsWith_default = startsWith;
+  var toPairs_default = toPairs;
 
   // predictionRamda.mjs
-  var wordTransitions = {};
-  var letterTransitions = {};
-  async function loadMarkovData() {
-    const wordRes = await fetch("./markov_word_transitions.json");
-    const letterRes = await fetch("./markov_letter_transitions.json");
-    wordTransitions = await wordRes.json();
-    letterTransitions = await letterRes.json();
+  var wordFrequencyMap = {};
+  function setCorpusWords(tokens2) {
+    wordFrequencyMap = {};
+    tokens2.forEach((token) => {
+      const word = token.toLowerCase();
+      wordFrequencyMap[word] = (wordFrequencyMap[word] || 0) + 1;
+    });
   }
-  function getNextWordProbabilities(context) {
-    for (let n = length_default(context); n > 0; n--) {
-      const key = pipe(
-        takeLast_default(n),
-        join_default(" ")
-      )(context);
-      const options = wordTransitions[key];
-      if (options) return { options, contextUsed: n };
-    }
-    return { options: null, contextUsed: 0 };
-  }
-  function completeWord(prefix, options) {
-    let best = null;
-    let bestProb = 0;
-    for (let word in options) {
-      if (startsWith_default(prefix)(word)) {
-        if (options[word] > bestProb) {
-          bestProb = options[word];
-          best = word;
-        }
+  function predictNextLetterProbs(prefix) {
+    const prefixLower = prefix.toLowerCase();
+    const counts = {};
+    let total = 0;
+    Object.entries(wordFrequencyMap).forEach(([word, freq]) => {
+      if (word.startsWith(prefixLower) && word.length > prefixLower.length) {
+        const nextChar = word[prefixLower.length];
+        counts[nextChar] = (counts[nextChar] || 0) + freq;
+        total += freq;
       }
-    }
-    return best ? best.slice(length_default(prefix)) : null;
-  }
-  function predictNextLetterProbs(currentPrefix, wordOptions = {}, context = "") {
-    const letterProbs = {};
-    let totalWeight = 0;
-    for (let word in wordOptions) {
-      if (!word.startsWith(currentPrefix)) continue;
-      const nextLetter = word[currentPrefix.length];
-      if (!nextLetter) continue;
-      const wp = wordOptions[word];
-      totalWeight += wp;
-      letterProbs[nextLetter] = (letterProbs[nextLetter] || 0) + wp;
-    }
-    if (currentPrefix.length > 0) {
-      const lastChar = currentPrefix[currentPrefix.length - 1].toLowerCase();
-      const letterOptions = letterTransitions[lastChar] || {};
-      for (let l in letterOptions) {
-        const lp = letterOptions[l];
-        totalWeight += lp;
-        letterProbs[l] = (letterProbs[l] || 0) + lp * 0.7;
-      }
-    }
-    if (Object.keys(letterProbs).length === 0) {
-      const commonStarts = letterTransitions[""] || {};
-      for (let l in commonStarts) {
-        letterProbs[l] = commonStarts[l];
-        totalWeight += commonStarts[l];
-      }
-    }
-    if (totalWeight > 0) {
-      for (let l in letterProbs) {
-        letterProbs[l] /= totalWeight;
-      }
-    }
-    return Object.fromEntries(
-      Object.entries(letterProbs).sort(([, a], [, b]) => b - a).slice(0, 10).filter(([, p]) => p > 0.05)
-      // seulement si la proba est > 0.05
-    );
-  }
-  function getMostProbableNextLetter(currentPrefix, options) {
-    const letterProbs = predictNextLetterProbs(currentPrefix, options);
-    let bestLetter = null;
-    let bestProb = 0;
-    for (let letter in letterProbs) {
-      if (letterProbs[letter] > bestProb) {
-        bestProb = letterProbs[letter];
-        bestLetter = letter;
-      }
-    }
-    return bestLetter;
+    });
+    if (total === 0) return { " ": 1 };
+    return pipe(
+      mapObjIndexed_default((count) => count / total),
+      toPairs_default,
+      sortBy_default(prop_default(1)),
+      reverse_default,
+      fromPairs_default
+    )(counts);
   }
 
   // src/keyboard.js
@@ -1142,43 +635,43 @@
               "keyboard__key--wide"
             );
             break;
+          // Partie du clavier avec les corrections pour la prédiction des lettres
+          // Dans la fonction _createKeys(), cas "default" corrigé :
           default:
             this._createKeyBtn("", "", () => {
               this.properties.value += this.properties.capsLock ? key.toUpperCase() : key.toLowerCase();
               this._updateValueInTarget();
               const currentValue = this.properties.value.trim().split(/\s+/);
-              const lastWord = currentValue[currentValue.length - 1] || "";
-              const context = currentValue.slice(0, -1);
-              const { options } = getNextWordProbabilities(context);
-              const word = completeWord(lastWord, options);
+              const lastWord = currentValue[currentValue.length - 1] || " ";
+              if (!corpusReady) {
+                console.warn("Le corpus n'est pas encore pr\xEAt !");
+                return;
+              }
+              const letterProbs = predictNextLetterProbs(lastWord);
               console.log("Valeur tap\xE9e :", this.properties.value);
               console.log("Mot en cours :", lastWord);
-              console.log("Contexte :", context);
-              console.log("Options:", options);
-              console.log("Mots en train de taper pr\xE9dit:", word);
-              console.log("Letter probs (filtered):", predictNextLetterProbs(lastWord, options));
-              console.log("most probable letter:", getMostProbableNextLetter(lastWord, options));
-              let letterProbs = predictNextLetterProbs(lastWord, options);
+              console.log("Letter probs:", letterProbs);
               this.elements.keys.forEach((keyEl) => {
-                const char = (keyEl.dataset.char || keyEl.textContent.trim()).toLowerCase();
-                if (!letterProbs[char]) {
-                  keyEl.classList.remove("activeYellow");
-                  keyEl.classList.remove("activePurple");
-                }
-                const prob = letterProbs[char];
-                if (prob > 0.2) {
-                  keyEl.classList.add("activePurple");
-                  keyEl.classList.remove("activeYellow");
-                } else if (prob > 0 && prob <= 0.2) {
-                  keyEl.classList.add("activeYellow");
-                  keyEl.classList.remove("activePurple");
+                keyEl.classList.remove("activeYellow", "activePurple");
+                let char;
+                if (keyEl.dataset.char) {
+                  char = keyEl.dataset.char.toLowerCase();
+                } else if (keyEl.textContent && keyEl.textContent.trim()) {
+                  char = keyEl.textContent.trim().toLowerCase();
                 } else {
-                  keyEl.classList.remove("activeYellow");
-                  keyEl.classList.remove("activePurple");
+                  return;
+                }
+                if (char === " " || char.length !== 1 || /[^a-z0-9]/.test(char)) return;
+                const prob = letterProbs[char] || 0;
+                if (prob > 0.15) {
+                  keyEl.classList.add("activePurple");
+                } else if (prob > 0.05) {
+                  keyEl.classList.add("activeYellow");
                 }
               });
             });
             this.keyElement.textContent = key.toLowerCase();
+            this.keyElement.dataset.char = key.toLowerCase();
             break;
         }
         fragment.appendChild(this.keyElement);
@@ -1212,8 +705,79 @@
       this.elements.main.classList.add("keyboard--hidden");
     }
   };
-  window.addEventListener("DOMContentLoaded", async () => {
-    await loadMarkovData();
+  var tokens = [];
+  function tokenizeText(text) {
+    return text.toLowerCase().replace(/[^a-z0-9\s!:;,]/gi, " ").split(/\s+/).filter(Boolean);
+  }
+  var corpusReady = false;
+  var FALLBACK_CORPUS = `
+    le chat dort paisiblement sur le canap\xE9 pendant que le chien court dans le jardin
+    la pluie tombe doucement sur les toits de la ville endormie
+    un bon livre et une tasse de th\xE9 chaud font le bonheur des jours de pluie
+    les oiseaux chantent \xE0 l'aurore pour saluer le lever du soleil
+    la connaissance s'acquiert par l'exp\xE9rience et l'observation
+`;
+  async function checkElectronAPI() {
+    if (!window.electronAPI) {
+      console.warn("L'API Electron n'est pas disponible dans le navigateur");
+      return false;
+    }
+    try {
+      const pingResponse = window.electronAPI.ping ? await window.electronAPI.ping() : null;
+      if (pingResponse === "pong") {
+        console.log("\u2705 L'API Electron est disponible et fonctionnelle");
+        return true;
+      } else {
+        console.warn("L'API Electron ne r\xE9pond pas comme pr\xE9vu");
+        return false;
+      }
+    } catch (error) {
+      console.error("Erreur lors de la v\xE9rification de l'API Electron:", error);
+      return false;
+    }
+  }
+  async function loadCorpus() {
+    console.log("D\xE9but du chargement du corpus...");
+    try {
+      const isElectronAvailable = await checkElectronAPI();
+      let corpusText = "";
+      if (isElectronAvailable) {
+        console.log("Tentative de chargement du corpus via l'API Electron...");
+        try {
+          corpusText = await window.electronAPI.loadCorpus();
+          console.log("R\xE9ponse de l'API re\xE7ue, longueur:", corpusText?.length || 0);
+          if (!corpusText || corpusText.trim() === "") {
+            throw new Error("Le corpus est vide");
+          }
+          console.log("Corpus charg\xE9 avec succ\xE8s via l'API Electron");
+        } catch (apiError) {
+          console.error("Erreur lors du chargement via l'API:", apiError);
+          throw apiError;
+        }
+      } else {
+        console.warn("API Electron non disponible, utilisation du corpus de secours");
+        corpusText = FALLBACK_CORPUS;
+      }
+      console.log("Traitement du texte du corpus...");
+      tokens = tokenizeText(corpusText);
+      if (tokens.length === 0) {
+        throw new Error("Aucun token valide trouv\xE9 dans le corpus");
+      }
+      console.log("D\xE9finition des mots du corpus...");
+      setCorpusWords(tokens);
+      corpusReady = true;
+      console.log("\u2705 Corpus pr\xEAt - ", tokens.length, "tokens charg\xE9s");
+    } catch (error) {
+      console.error("\u274C Erreur critique lors du chargement du corpus:", error);
+      console.warn("Utilisation du corpus de secours...");
+      tokens = tokenizeText(FALLBACK_CORPUS);
+      setCorpusWords(tokens);
+      corpusReady = true;
+      console.log("\u2705 Corpus de secours charg\xE9 avec succ\xE8s -", tokens.length, "tokens");
+    }
+  }
+  loadCorpus().catch(console.error);
+  window.addEventListener("DOMContentLoaded", () => {
     Keyboard.init();
     setTimeout(() => {
       Keyboard.elements.main.classList.add("keyboard--visible");

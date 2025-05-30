@@ -1,7 +1,7 @@
 const esbuild = require('esbuild');
 
 esbuild.build({
-    entryPoints: ['src/keyboard.js'],
+    entryPoints: ['keyboard.js'],
     bundle: true,
     outfile: 'dist/renderer.bundle.js',
     platform: 'browser',
