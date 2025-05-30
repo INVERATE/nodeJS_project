@@ -6,7 +6,41 @@ import {
     loadMarkovModels
 } from "./predictionRamda.mjs";
 
+// Initialisation des modèles au chargement du module
+let modelsInitialized = false;
 
+// Fonction pour initialiser les modèles
+async function initializePredictionModels() {
+    if (modelsInitialized) return;
+    
+    try {
+        // Vérification de l'API de prédiction
+        if (!window.predictionAPI) {
+            throw new Error('Impossible d\'accéder à l\'API de prédiction');
+        }
+
+        console.log('Chargement du corpus...');
+        // Chargement du corpus depuis les fichiers du dataset
+        const corpusTokens = await window.predictionAPI.loadCorpus();
+        if (corpusTokens.length === 0) {
+            throw new Error('Le corpus est vide');
+        }
+        
+        // Initialisation du corpus de mots
+        setCorpusWords(corpusTokens);
+        console.log(`Corpus initialisé avec ${corpusTokens.length} tokens`);
+        
+        // Chargement des modèles Markov
+        console.log('Chargement des modèles Markov...');
+        const { wordTransitions, letterTransitions } = await window.predictionAPI.loadMarkovModels();
+        loadMarkovModels(wordTransitions, letterTransitions);
+        
+        modelsInitialized = true;
+        console.log('Modèles de prédiction initialisés avec succès');
+    } catch (error) {
+        console.error('Erreur lors de l\'initialisation des modèles:', error);
+    }
+}
 
 const Keyboard = {
     elements: {
@@ -28,14 +62,14 @@ const Keyboard = {
         ],
     },
 
-    init() {
+    async init() {
+        // Initialisation des modèles de prédiction
+        await initializePredictionModels();
+        
         // create and setup main element
-        this.elements.main =
-            document.createElement("div");
-        this.elements.main.classList
-            .add("keyboard");
-        document.body
-            .appendChild(this.elements.main);
+        this.elements.main = document.createElement("div");
+        this.elements.main.classList.add("keyboard");
+        document.body.appendChild(this.elements.main);
 
         // create and setup child container component
         this.elements.keysContainer =

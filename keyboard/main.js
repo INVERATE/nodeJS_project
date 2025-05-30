@@ -1,12 +1,14 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 
-function createWindow() {
+async function createWindow() {
+    // Attendre que le bundle preload soit construit
+    await new Promise(resolve => setTimeout(resolve, 1000));
     const win = new BrowserWindow({
         width: 800,
         height: 600,
         webPreferences: {
-            preload: path.join(__dirname,'src', 'preload.js'),
+            preload: path.join(__dirname, 'dist', 'preload.bundle.js'),
             contextIsolation: true,
             nodeIntegration: false
         }

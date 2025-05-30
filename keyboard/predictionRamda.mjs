@@ -8,23 +8,19 @@ export let markovLetterTransitions = {};
  * Initialise la fréquence des mots du corpus
  * @param {string[]} tokens - Liste de tokens extraits du corpus
  */
-export function setCorpusWords(tokens) {
-    wordFrequencyMap = {};
-    tokens.forEach(token => {
-        const word = token.toLowerCase();
-        wordFrequencyMap[word] = (wordFrequencyMap[word] || 0) + 1;
-    });
-}
+export const setCorpusWords = (tokens) => {
+    wordFrequencyMap = R.countBy(R.toLower)(tokens);
+};
 
 /**
  * Charge les modèles Markov pré-entraînés
  * @param {Object} wordTransitions - Transitions entre mots (bigrammes)
  * @param {Object} letterTransitions - Transitions entre lettres
  */
-export function loadMarkovModels(wordTransitions, letterTransitions) {
+export const loadMarkovModels = (wordTransitions, letterTransitions) => {
     markovWordTransitions = wordTransitions;
     markovLetterTransitions = letterTransitions;
-}
+};
 
 /**
  * Prédit les prochaines lettres en combinant contexte, transitions de mots et transitions de lettres
@@ -32,123 +28,98 @@ export function loadMarkovModels(wordTransitions, letterTransitions) {
  * @param {string} currentPrefix - Début du mot en cours d'écriture
  * @returns {Object} - Objet { lettre: probabilité } trié par probabilité décroissante
  */
-export function predictNextLetters(context, currentPrefix) {
+export const predictNextLetters = (context, currentPrefix) => {
     const currentPrefixLower = currentPrefix.toLowerCase();
-    const contextLower = context.map(w => w.toLowerCase());
+    const contextLower = context.map(R.toLower);
 
-    // 1. Probabilités basées sur la complétion de mot (sans contexte)
     const wordCompletionProbs = getWordCompletionProbs(currentPrefixLower);
-
-    // 2. Probabilités basées sur le contexte (bigrammes de mots)
     const contextBasedProbs = getContextBasedProbs(contextLower, currentPrefixLower);
-
-    // 3. Probabilités basées sur les transitions de lettres
     const letterTransitionProbs = getLetterTransitionProbs(currentPrefixLower);
 
-    // Combinaison pondérée des modèles
-    const combinedProbs = combineProbabilities(
-        wordCompletionProbs,
-        contextBasedProbs,
-        letterTransitionProbs
-    );
+    return combineProbabilities(wordCompletionProbs, contextBasedProbs, letterTransitionProbs);
+};
 
-    return combinedProbs;
-}
-
-function getWordCompletionProbs(prefix) {
-    const counts = {};
-    let total = 0;
-
-    Object.entries(wordFrequencyMap).forEach(([word, freq]) => {
-        if (word.startsWith(prefix) && word.length > prefix.length) {
+const getWordCompletionProbs = (prefix) => {
+    // Filtrer mots commençant par prefix et plus longs, récupérer la lettre suivante + fréquence
+    const filtered = R.pipe(
+        R.toPairs,
+        R.filter(([word]) => word.startsWith(prefix) && word.length > prefix.length),
+        R.reduce((acc, [word, freq]) => {
             const nextChar = word[prefix.length];
-            counts[nextChar] = (counts[nextChar] || 0) + freq;
-            total += freq;
-        }
-    });
+            acc[nextChar] = (acc[nextChar] || 0) + freq;
+            return acc;
+        }, {})
+    )(wordFrequencyMap);
 
-    return total > 0
-        ? normalizeProbs(counts, total)
-        : {};
-}
+    const total = R.sum(R.values(filtered));
+    return total > 0 ? normalizeProbs(filtered, total) : {};
+};
 
-function getContextBasedProbs(context, prefix) {
+const getContextBasedProbs = (context, prefix) => {
     if (context.length === 0) return {};
 
-    // Utilise les 2 derniers mots du contexte
-    const contextKey = context.slice(-2).join(' ');
+    const contextKey = R.takeLast(2, context).join(" "); // Derniers deux mots
     const nextWordDist = markovWordTransitions[contextKey] || {};
 
-    // Filtre les mots commençant par le préfixe
-    const filteredWords = Object.entries(nextWordDist)
-        .filter(([word]) => word.startsWith(prefix))
-        .filter(([word]) => word.length > prefix.length);
+    const filtered = R.pipe(
+        R.toPairs,
+        R.filter(([word]) => word.startsWith(prefix) && word.length > prefix.length),
+        R.reduce((acc, [word, prob]) => {
+            const nextChar = word[prefix.length];
+            acc[nextChar] = (acc[nextChar] || 0) + prob;
+            return acc;
+        }, {})
+    )(nextWordDist);
 
-    // Agrège par prochaine lettre
-    const counts = {};
-    let total = 0;
+    const total = R.sum(R.values(filtered));
+    return total > 0 ? normalizeProbs(filtered, total) : {};
+};
 
-    filteredWords.forEach(([word, prob]) => {
-        const nextChar = word[prefix.length];
-        counts[nextChar] = (counts[nextChar] || 0) + prob;
-        total += prob;
-    });
-
-    return total > 0
-        ? normalizeProbs(counts, total)
-        : {};
-}
-
-function getLetterTransitionProbs(prefix) {
+const getLetterTransitionProbs = (prefix) => {
     if (prefix.length === 0) return {};
 
-    // Prend les 2 derniers caractères du préfixe
-    const lastChars = prefix.slice(-2);
+    const lastChars = prefix.slice(-2); // Derniers deux caractères
     const transitions = markovLetterTransitions[lastChars] || {};
 
-    return normalizeProbs(transitions, Object.values(transitions).reduce((a, b) => a + b, 0));
-}
+    const total = R.sum(R.values(transitions));
+    return total > 0 ? normalizeProbs(transitions, total) : {};
+};
 
-function combineProbabilities(probsA, probsB, probsC) {
-    const weights = { A: 0.4, B: 0.4, C: 0.2 }; // Poids ajustables
-    const combined = {};
-    const allKeys = new Set([
-        ...Object.keys(probsA),
-        ...Object.keys(probsB),
-        ...Object.keys(probsC)
+const combineProbabilities = (probsA, probsB, probsC) => {
+    const weights = { A: 0.4, B: 0.4, C: 0.2 }; // Coefficients de poids qui permettent de modifier l'importance des modèles
+    const allKeys = R.uniq([
+        ...R.keys(probsA), // trois petits points (...) permettent de concattener les tableaux
+        ...R.keys(probsB),
+        ...R.keys(probsC),
     ]);
 
-    allKeys.forEach(key => {
-        combined[key] =
-            (probsA[key] || 0) * weights.A +
-            (probsB[key] || 0) * weights.B +
-            (probsC[key] || 0) * weights.C;
-    });
-
-    // Normalisation finale
-    return normalizeAndSort(combined);
-}
-
-function normalizeProbs(counts, total) {
-    return Object.fromEntries(
-        Object.entries(counts).map(([key, value]) => [key, value / total])
+    const combined = R.reduce(
+        (acc, key) => ({
+            ...acc,
+            [key]:
+                (probsA[key] || 0) * weights.A +
+                (probsB[key] || 0) * weights.B +
+                (probsC[key] || 0) * weights.C,
+        }),
+        {},
+        allKeys
     );
-}
 
-function normalizeAndSort(probs) {
-    const total = Object.values(probs).reduce((sum, val) => sum + val, 0);
-    if (total <= 0) return { ' ': 1 }; // Cas par défaut
+    return normalizeAndSort(combined);
+};
 
-    //trier selon la probabilité
-    const normalized = R.pipe(
-        R.mapObjIndexed(val => val / total),
+const normalizeProbs = (counts, total) =>
+    R.map((v) => v / total, counts);
+
+const normalizeAndSort = (probs) => {
+    const total = R.sum(R.values(probs));
+    if (total <= 0) return { " ": 1 };
+
+    return R.pipe(
+        R.map((v) => v / total),
         R.toPairs,
-        R.sortBy(R.last),
+        R.sortBy(R.last), // tri par probabilité
         R.reverse,
         R.fromPairs
     )(probs);
-
-
-
-    return normalized;
-}
+};
