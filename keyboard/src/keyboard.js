@@ -76,7 +76,7 @@ const Keyboard = {
         this.elements.main =
             document.createElement("div");
         this.elements.main.classList
-            .add("keyboard", "keyboard--hidden");
+            .add("keyboard");
         document.body
             .appendChild(this.elements.main);
 
@@ -116,7 +116,7 @@ const Keyboard = {
         return `<span class="material-icons">${icon_name}</span>`;
     },
 
-    _createKeyBtn(iconName = "", class1 = "", onclick = () => {}, class2 = "") {
+    _createKeyBtn(iconName = "", class1 = "", onclick = () => {}, class2 = "", dataChar = null) {
         this.keyElement = document.createElement("button");
 
         this.keyElement.setAttribute("type", "button");
@@ -129,8 +129,15 @@ const Keyboard = {
             this.keyElement.innerHTML = this._createIconHTML(iconName);
         }
 
+        if (dataChar !== null) {
+            this.keyElement.dataset.char = dataChar;
+        }
+
         this.keyElement.addEventListener("click", onclick);
+
+        return this.keyElement;
     },
+
 
     _createKeys() {
         const fragment =
@@ -176,13 +183,19 @@ const Keyboard = {
                     break;
 
                 case "space":
-                    this._createKeyBtn(
-                        "space_bar", "keyboard__key--extra--wide",
+                    const spaceBtn = this._createKeyBtn(
+                        "space_bar",
+                        "keyboard__key--extra--wide",
                         () => {
                             this.properties.value += " ";
                             this._updateValueInTarget();
-                        });
+                        },
+                        "", // pas de class2
+                        " " // data-char pour la touche espace
+                    );
+                    fragment.appendChild(spaceBtn);
                     break;
+
 
                 case "done":
                     this._createKeyBtn(
@@ -212,27 +225,46 @@ const Keyboard = {
                         const context = currentValue.slice(0, -1); // ⚠️ important
                         const { options } = getNextWordProbabilities(context);
 
-                        const word = completeWord(this.properties.value, options)
+                        const word = completeWord(lastWord, options);
+
 
                         console.log("Valeur tapée :", this.properties.value);
                         console.log("Mot en cours :", lastWord);
                         console.log("Contexte :", context);
                         console.log("Options:", options);
                         console.log("Mots en train de taper prédit:", word);
+                        console.log("Letter probs (filtered):", predictNextLetterProbs(lastWord, options));
+                        console.log("most probable letter:", getMostProbableNextLetter(lastWord, options));
 
 
-                        if (options) {
-                            const suggestions = predictNextLetterProbs(lastWord, options);
+                        //prédire les prochaines lettres en fonctione des mots précédents et du mot en cours
 
-                            this.elements.keys.forEach((keyEl) => {
-                                const char = keyEl.textContent.toLowerCase();
-                                if (suggestions[char]) {
-                                    keyEl.classList.add("active"); // ou change la taille/style
-                                } else {
-                                    keyEl.classList.remove("active");
-                                }
-                            });
-                        }
+                        let letterProbs = predictNextLetterProbs(lastWord, options);
+
+                        this.elements.keys.forEach((keyEl) => {
+                            //const char = keyEl.textContent.toLowerCase();
+                            const char = (keyEl.dataset.char || keyEl.textContent.trim()).toLowerCase();
+
+                            if (!letterProbs[char]) {
+                                keyEl.classList.remove("activeYellow");
+                                keyEl.classList.remove("activePurple");
+                            }
+                            const prob = letterProbs[char];
+
+                            if (prob > 0.2) {
+                                keyEl.classList.add("activePurple");
+                                keyEl.classList.remove("activeYellow");
+                            } else if (prob > 0 && prob <= 0.2) {
+                                keyEl.classList.add("activeYellow");
+                                keyEl.classList.remove("activePurple");
+                            } else {
+                                keyEl.classList.remove("activeYellow");
+                                keyEl.classList.remove("activePurple");
+                            }
+
+                        });
+
+
                     });
 
                     // Affichage de la lettre sur la touche
@@ -282,11 +314,12 @@ const Keyboard = {
         this.elements.main
             .classList
             .remove("keyboard--hidden");
+        this.elements.main.classList.add("keyboard--visible");
     },
 
     close() {
-        this.properties.value =
-            this.properties.value;
+        this.elements.main.classList.remove("keyboard--visible");
+        this.properties.value = this.properties.value;
         this.elements.main
             .classList.add("keyboard--hidden");
     },
@@ -298,7 +331,11 @@ const Keyboard = {
 window.addEventListener("DOMContentLoaded", async () => {
     await loadMarkovData();
     Keyboard.init();
-    //setRamda("Ramda");
+    // Ajout d'une animation douce pour le clavier
+    setTimeout(() => {
+        Keyboard.elements.main.classList.add("keyboard--visible");
+    }, 100); // petit délai pour déclencher la transition CSS
+
 });
 
 

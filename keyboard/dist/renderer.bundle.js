@@ -930,23 +930,54 @@
     }
     return best ? best.slice(length_default(prefix)) : null;
   }
-  function predictNextLetterProbs(currentPrefix, options) {
+  function predictNextLetterProbs(currentPrefix, wordOptions = {}, context = "") {
     const letterProbs = {};
     let totalWeight = 0;
-    for (let word in options) {
+    for (let word in wordOptions) {
       if (!word.startsWith(currentPrefix)) continue;
-      const nextLetter = word[length_default(currentPrefix)];
+      const nextLetter = word[currentPrefix.length];
       if (!nextLetter) continue;
-      const wordProb = options[word];
-      totalWeight += wordProb;
-      if (!letterProbs[nextLetter]) letterProbs[nextLetter] = 0;
-      letterProbs[nextLetter] += wordProb;
+      const wp = wordOptions[word];
+      totalWeight += wp;
+      letterProbs[nextLetter] = (letterProbs[nextLetter] || 0) + wp;
     }
-    for (let l in letterProbs) {
-      letterProbs[l] /= totalWeight;
+    if (currentPrefix.length > 0) {
+      const lastChar = currentPrefix[currentPrefix.length - 1].toLowerCase();
+      const letterOptions = letterTransitions[lastChar] || {};
+      for (let l in letterOptions) {
+        const lp = letterOptions[l];
+        totalWeight += lp;
+        letterProbs[l] = (letterProbs[l] || 0) + lp * 0.7;
+      }
     }
-    console.log(letterProbs);
-    return letterProbs;
+    if (Object.keys(letterProbs).length === 0) {
+      const commonStarts = letterTransitions[""] || {};
+      for (let l in commonStarts) {
+        letterProbs[l] = commonStarts[l];
+        totalWeight += commonStarts[l];
+      }
+    }
+    if (totalWeight > 0) {
+      for (let l in letterProbs) {
+        letterProbs[l] /= totalWeight;
+      }
+    }
+    return Object.fromEntries(
+      Object.entries(letterProbs).sort(([, a], [, b]) => b - a).slice(0, 10).filter(([, p]) => p > 0.05)
+      // seulement si la proba est > 0.05
+    );
+  }
+  function getMostProbableNextLetter(currentPrefix, options) {
+    const letterProbs = predictNextLetterProbs(currentPrefix, options);
+    let bestLetter = null;
+    let bestProb = 0;
+    for (let letter in letterProbs) {
+      if (letterProbs[letter] > bestProb) {
+        bestProb = letterProbs[letter];
+        bestLetter = letter;
+      }
+    }
+    return bestLetter;
   }
 
   // src/keyboard.js
@@ -1010,7 +1041,7 @@
     },
     init() {
       this.elements.main = document.createElement("div");
-      this.elements.main.classList.add("keyboard", "keyboard--hidden");
+      this.elements.main.classList.add("keyboard");
       document.body.appendChild(this.elements.main);
       this.elements.keysContainer = document.createElement("div");
       this.elements.keysContainer.classList.add("keyboard__keys");
@@ -1032,7 +1063,7 @@
       return `<span class="material-icons">${icon_name}</span>`;
     },
     _createKeyBtn(iconName = "", class1 = "", onclick = () => {
-    }, class2 = "") {
+    }, class2 = "", dataChar = null) {
       this.keyElement = document.createElement("button");
       this.keyElement.setAttribute("type", "button");
       this.keyElement.classList.add("keyboard__key");
@@ -1041,7 +1072,11 @@
       if (iconName) {
         this.keyElement.innerHTML = this._createIconHTML(iconName);
       }
+      if (dataChar !== null) {
+        this.keyElement.dataset.char = dataChar;
+      }
       this.keyElement.addEventListener("click", onclick);
+      return this.keyElement;
     },
     _createKeys() {
       const fragment = document.createDocumentFragment();
@@ -1081,14 +1116,19 @@
             );
             break;
           case "space":
-            this._createKeyBtn(
+            const spaceBtn = this._createKeyBtn(
               "space_bar",
               "keyboard__key--extra--wide",
               () => {
                 this.properties.value += " ";
                 this._updateValueInTarget();
-              }
+              },
+              "",
+              // pas de class2
+              " "
+              // data-char pour la touche espace
             );
+            fragment.appendChild(spaceBtn);
             break;
           case "done":
             this._createKeyBtn(
@@ -1109,23 +1149,33 @@
               const lastWord = currentValue[currentValue.length - 1] || "";
               const context = currentValue.slice(0, -1);
               const { options } = getNextWordProbabilities(context);
-              const word = completeWord(this.properties.value, options);
+              const word = completeWord(lastWord, options);
               console.log("Valeur tap\xE9e :", this.properties.value);
               console.log("Mot en cours :", lastWord);
               console.log("Contexte :", context);
               console.log("Options:", options);
               console.log("Mots en train de taper pr\xE9dit:", word);
-              if (options) {
-                const suggestions = predictNextLetterProbs(lastWord, options);
-                this.elements.keys.forEach((keyEl) => {
-                  const char = keyEl.textContent.toLowerCase();
-                  if (suggestions[char]) {
-                    keyEl.classList.add("active");
-                  } else {
-                    keyEl.classList.remove("active");
-                  }
-                });
-              }
+              console.log("Letter probs (filtered):", predictNextLetterProbs(lastWord, options));
+              console.log("most probable letter:", getMostProbableNextLetter(lastWord, options));
+              let letterProbs = predictNextLetterProbs(lastWord, options);
+              this.elements.keys.forEach((keyEl) => {
+                const char = (keyEl.dataset.char || keyEl.textContent.trim()).toLowerCase();
+                if (!letterProbs[char]) {
+                  keyEl.classList.remove("activeYellow");
+                  keyEl.classList.remove("activePurple");
+                }
+                const prob = letterProbs[char];
+                if (prob > 0.2) {
+                  keyEl.classList.add("activePurple");
+                  keyEl.classList.remove("activeYellow");
+                } else if (prob > 0 && prob <= 0.2) {
+                  keyEl.classList.add("activeYellow");
+                  keyEl.classList.remove("activePurple");
+                } else {
+                  keyEl.classList.remove("activeYellow");
+                  keyEl.classList.remove("activePurple");
+                }
+              });
             });
             this.keyElement.textContent = key.toLowerCase();
             break;
@@ -1153,8 +1203,10 @@
     open(initialValue, oninput) {
       this.properties.value = initialValue || "";
       this.elements.main.classList.remove("keyboard--hidden");
+      this.elements.main.classList.add("keyboard--visible");
     },
     close() {
+      this.elements.main.classList.remove("keyboard--visible");
       this.properties.value = this.properties.value;
       this.elements.main.classList.add("keyboard--hidden");
     }
@@ -1162,6 +1214,9 @@
   window.addEventListener("DOMContentLoaded", async () => {
     await loadMarkovData();
     Keyboard.init();
+    setTimeout(() => {
+      Keyboard.elements.main.classList.add("keyboard--visible");
+    }, 100);
   });
 })();
 //# sourceMappingURL=renderer.bundle.js.map

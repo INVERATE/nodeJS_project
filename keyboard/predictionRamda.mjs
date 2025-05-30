@@ -67,31 +67,71 @@ export function predictLetterCompletion(wordSoFar) {
     return result;
 }
 
-// ** Nouvelle fonction : probas des prochaines lettres selon mots candidats **
-export function predictNextLetterProbs(currentPrefix, options) {
+/**
+ * Predicts the next most probable letters based on context and current word prefix
+ * @param {string} currentPrefix - The current partial word being typed
+ * @param {Object} wordOptions - Word transition probabilities from the context
+ * @param {string} context - The context (previous words)
+ * @returns {Object} Object with letters as keys and their probabilities as values
+ */
+/**
+ * @param {string} currentPrefix
+ * @param {Object<string, number>} wordOptions – dictionnaire mot → proba
+ * @returns {Object<string, number>} – top 5 lettres suivantes + leur proba normalisée
+ */
+
+export function predictNextLetterProbs(currentPrefix, wordOptions = {}, context = '') {
     const letterProbs = {};
     let totalWeight = 0;
 
-    for (let word in options) {
+    // 1) mots issus du contexte
+    for (let word in wordOptions) {
         if (!word.startsWith(currentPrefix)) continue;
-
-        const nextLetter = word[R.length(currentPrefix)];
+        const nextLetter = word[currentPrefix.length];
         if (!nextLetter) continue;
-
-        const wordProb = options[word];
-        totalWeight += wordProb;
-
-        if (!letterProbs[nextLetter]) letterProbs[nextLetter] = 0;
-        letterProbs[nextLetter] += wordProb;
+        const wp = wordOptions[word];
+        totalWeight += wp;
+        letterProbs[nextLetter] = (letterProbs[nextLetter] || 0) + wp;
     }
 
-    // Normalisation
-    for (let l in letterProbs) {
-        letterProbs[l] /= totalWeight;
+    // 2) transitions de lettres (dernière lettre du préfixe)
+    if (currentPrefix.length > 0) {
+        const lastChar = currentPrefix[currentPrefix.length - 1].toLowerCase();
+        const letterOptions = letterTransitions[lastChar] || {};
+        for (let l in letterOptions) {
+            const lp = letterOptions[l];
+            totalWeight += lp;
+            letterProbs[l] = (letterProbs[l] || 0) + lp * 0.7;
+        }
     }
-    console.log(letterProbs);
-    return letterProbs;
+
+    // 3) fallback si aucune proba
+    if (Object.keys(letterProbs).length === 0) {
+        const commonStarts = letterTransitions[''] || {};
+        for (let l in commonStarts) {
+            letterProbs[l] = commonStarts[l];
+            totalWeight += commonStarts[l];
+        }
+    }
+
+    // 4) normalisation
+    if (totalWeight > 0) {
+        for (let l in letterProbs) {
+            letterProbs[l] /= totalWeight;
+        }
+    }
+
+    // 5) on ne garde que les 5 lettres les plus probables
+    return Object.fromEntries(
+        Object.entries(letterProbs)
+            .sort(([, a], [, b]) => b - a)
+            .slice(0, 10)
+            .filter(([, p]) => p > 0.05) // seulement si la proba est > 0.05
+
+    );
 }
+
+
 
 export function getMostProbableNextLetter(currentPrefix, options) {
     const letterProbs = predictNextLetterProbs(currentPrefix, options);
