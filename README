@@ -3,3 +3,11 @@ Néo COLPIN
 Fanny BADOULES
 Thibault MORETTI
 Sujet : Probabilité prochain mot
+
+
+
+Explication partie Fanny :
+
+L’extension .mjs signifie “Module JavaScript”, et elle sert à indiquer à Node.js que le fichier utilise la syntaxe de modules ECMAScript (ESM), c’est-à-dire :
+
+    import / export au lieu de require() / module.exports
