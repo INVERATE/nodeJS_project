@@ -1,10 +1,10 @@
 (() => {
-  // node_modules/ramda/es/internal/_isPlaceholder.js
+  // ../node_modules/ramda/es/internal/_isPlaceholder.js
   function _isPlaceholder(a) {
     return a != null && typeof a === "object" && a["@@functional/placeholder"] === true;
   }
 
-  // node_modules/ramda/es/internal/_curry1.js
+  // ../node_modules/ramda/es/internal/_curry1.js
   function _curry1(fn) {
     return function f1(a) {
       if (arguments.length === 0 || _isPlaceholder(a)) {
@@ -15,7 +15,7 @@
     };
   }
 
-  // node_modules/ramda/es/internal/_curry2.js
+  // ../node_modules/ramda/es/internal/_curry2.js
   function _curry2(fn) {
     return function f2(a, b) {
       switch (arguments.length) {
@@ -35,13 +35,13 @@
     };
   }
 
-  // node_modules/ramda/es/add.js
+  // ../node_modules/ramda/es/add.js
   var add = /* @__PURE__ */ _curry2(function add2(a, b) {
     return Number(a) + Number(b);
   });
   var add_default = add;
 
-  // node_modules/ramda/es/internal/_arity.js
+  // ../node_modules/ramda/es/internal/_arity.js
   function _arity(n, fn) {
     switch (n) {
       case 0:
@@ -93,7 +93,7 @@
     }
   }
 
-  // node_modules/ramda/es/internal/_curryN.js
+  // ../node_modules/ramda/es/internal/_curryN.js
   function _curryN(length, received, fn) {
     return function() {
       var combined = [];
@@ -118,7 +118,7 @@
     };
   }
 
-  // node_modules/ramda/es/curryN.js
+  // ../node_modules/ramda/es/curryN.js
   var curryN = /* @__PURE__ */ _curry2(function curryN2(length, fn) {
     if (length === 1) {
       return _curry1(fn);
@@ -127,7 +127,7 @@
   });
   var curryN_default = curryN;
 
-  // node_modules/ramda/es/internal/_curry3.js
+  // ../node_modules/ramda/es/internal/_curry3.js
   function _curry3(fn) {
     return function f3(a, b, c) {
       switch (arguments.length) {
@@ -163,17 +163,17 @@
     };
   }
 
-  // node_modules/ramda/es/internal/_isArray.js
+  // ../node_modules/ramda/es/internal/_isArray.js
   var isArray_default = Array.isArray || function _isArray(val) {
     return val != null && val.length >= 0 && Object.prototype.toString.call(val) === "[object Array]";
   };
 
-  // node_modules/ramda/es/internal/_isTransformer.js
+  // ../node_modules/ramda/es/internal/_isTransformer.js
   function _isTransformer(obj) {
     return obj != null && typeof obj["@@transducer/step"] === "function";
   }
 
-  // node_modules/ramda/es/internal/_dispatchable.js
+  // ../node_modules/ramda/es/internal/_dispatchable.js
   function _dispatchable(methodNames, xf, fn) {
     return function() {
       if (arguments.length === 0) {
@@ -198,7 +198,7 @@
     };
   }
 
-  // node_modules/ramda/es/internal/_xfBase.js
+  // ../node_modules/ramda/es/internal/_xfBase.js
   var xfBase_default = {
     init: function() {
       return this.xf["@@transducer/init"]();
@@ -208,7 +208,7 @@
     }
   };
 
-  // node_modules/ramda/es/internal/_map.js
+  // ../node_modules/ramda/es/internal/_map.js
   function _map(fn, functor) {
     var idx = 0;
     var len = functor.length;
@@ -220,12 +220,12 @@
     return result;
   }
 
-  // node_modules/ramda/es/internal/_isString.js
+  // ../node_modules/ramda/es/internal/_isString.js
   function _isString(x) {
     return Object.prototype.toString.call(x) === "[object String]";
   }
 
-  // node_modules/ramda/es/internal/_isArrayLike.js
+  // ../node_modules/ramda/es/internal/_isArrayLike.js
   var _isArrayLike = /* @__PURE__ */ _curry1(function isArrayLike(x) {
     if (isArray_default(x)) {
       return true;
@@ -252,7 +252,7 @@
   });
   var isArrayLike_default = _isArrayLike;
 
-  // node_modules/ramda/es/internal/_xwrap.js
+  // ../node_modules/ramda/es/internal/_xwrap.js
   var XWrap = /* @__PURE__ */ function() {
     function XWrap2(fn) {
       this.f = fn;
@@ -272,7 +272,7 @@
     return new XWrap(fn);
   }
 
-  // node_modules/ramda/es/bind.js
+  // ../node_modules/ramda/es/bind.js
   var bind = /* @__PURE__ */ _curry2(function bind2(fn, thisObj) {
     return _arity(fn.length, function() {
       return fn.apply(thisObj, arguments);
@@ -280,7 +280,7 @@
   });
   var bind_default = bind;
 
-  // node_modules/ramda/es/internal/_reduce.js
+  // ../node_modules/ramda/es/internal/_reduce.js
   function _arrayReduce(xf, acc, list) {
     var idx = 0;
     var len = list.length;
@@ -332,7 +332,7 @@
     throw new TypeError("reduce: list must be array or iterable");
   }
 
-  // node_modules/ramda/es/internal/_xmap.js
+  // ../node_modules/ramda/es/internal/_xmap.js
   var XMap = /* @__PURE__ */ function() {
     function XMap2(f, xf) {
       this.xf = xf;
@@ -350,12 +350,12 @@
   });
   var xmap_default = _xmap;
 
-  // node_modules/ramda/es/internal/_has.js
+  // ../node_modules/ramda/es/internal/_has.js
   function _has(prop, obj) {
     return Object.prototype.hasOwnProperty.call(obj, prop);
   }
 
-  // node_modules/ramda/es/internal/_isArguments.js
+  // ../node_modules/ramda/es/internal/_isArguments.js
   var toString = Object.prototype.toString;
   var _isArguments = /* @__PURE__ */ function() {
     return toString.call(arguments) === "[object Arguments]" ? function _isArguments2(x) {
@@ -366,7 +366,7 @@
   }();
   var isArguments_default = _isArguments;
 
-  // node_modules/ramda/es/keys.js
+  // ../node_modules/ramda/es/keys.js
   var hasEnumBug = !/* @__PURE__ */ {
     toString: null
   }.propertyIsEnumerable("toString");
@@ -413,7 +413,7 @@
   });
   var keys_default = keys;
 
-  // node_modules/ramda/es/map.js
+  // ../node_modules/ramda/es/map.js
   var map = /* @__PURE__ */ _curry2(
     /* @__PURE__ */ _dispatchable(["fantasy-land/map", "map"], xmap_default, function map2(fn, functor) {
       switch (Object.prototype.toString.call(functor)) {
@@ -433,18 +433,18 @@
   );
   var map_default = map;
 
-  // node_modules/ramda/es/nth.js
+  // ../node_modules/ramda/es/nth.js
   var nth = /* @__PURE__ */ _curry2(function nth2(offset, list) {
     var idx = offset < 0 ? list.length + offset : offset;
     return _isString(list) ? list.charAt(idx) : list[idx];
   });
   var nth_default = nth;
 
-  // node_modules/ramda/es/reduce.js
+  // ../node_modules/ramda/es/reduce.js
   var reduce = /* @__PURE__ */ _curry3(_reduce);
   var reduce_default = reduce;
 
-  // node_modules/ramda/es/values.js
+  // ../node_modules/ramda/es/values.js
   var values = /* @__PURE__ */ _curry1(function values2(obj) {
     var props = keys_default(obj);
     var len = props.length;
@@ -458,24 +458,24 @@
   });
   var values_default = values;
 
-  // node_modules/ramda/es/internal/_isFunction.js
+  // ../node_modules/ramda/es/internal/_isFunction.js
   function _isFunction(x) {
     var type3 = Object.prototype.toString.call(x);
     return type3 === "[object Function]" || type3 === "[object AsyncFunction]" || type3 === "[object GeneratorFunction]" || type3 === "[object AsyncGeneratorFunction]";
   }
 
-  // node_modules/ramda/es/internal/_cloneRegExp.js
+  // ../node_modules/ramda/es/internal/_cloneRegExp.js
   function _cloneRegExp(pattern) {
     return new RegExp(pattern.source, (pattern.global ? "g" : "") + (pattern.ignoreCase ? "i" : "") + (pattern.multiline ? "m" : "") + (pattern.sticky ? "y" : "") + (pattern.unicode ? "u" : ""));
   }
 
-  // node_modules/ramda/es/type.js
+  // ../node_modules/ramda/es/type.js
   var type = /* @__PURE__ */ _curry1(function type2(val) {
     return val === null ? "Null" : val === void 0 ? "Undefined" : Object.prototype.toString.call(val).slice(8, -1);
   });
   var type_default = type;
 
-  // node_modules/ramda/es/internal/_clone.js
+  // ../node_modules/ramda/es/internal/_clone.js
   function _clone(value, refFrom, refTo, deep) {
     var copy = function copy2(copiedValue) {
       var len = refFrom.length;
@@ -507,14 +507,14 @@
     }
   }
 
-  // node_modules/ramda/es/internal/_pipe.js
+  // ../node_modules/ramda/es/internal/_pipe.js
   function _pipe(f, g) {
     return function() {
       return g.call(this, f.apply(this, arguments));
     };
   }
 
-  // node_modules/ramda/es/internal/_checkForMethod.js
+  // ../node_modules/ramda/es/internal/_checkForMethod.js
   function _checkForMethod(methodname, fn) {
     return function() {
       var length = arguments.length;
@@ -526,7 +526,7 @@
     };
   }
 
-  // node_modules/ramda/es/slice.js
+  // ../node_modules/ramda/es/slice.js
   var slice = /* @__PURE__ */ _curry3(
     /* @__PURE__ */ _checkForMethod("slice", function slice2(fromIndex, toIndex, list) {
       return Array.prototype.slice.call(list, fromIndex, toIndex);
@@ -534,7 +534,7 @@
   );
   var slice_default = slice;
 
-  // node_modules/ramda/es/tail.js
+  // ../node_modules/ramda/es/tail.js
   var tail = /* @__PURE__ */ _curry1(
     /* @__PURE__ */ _checkForMethod(
       "tail",
@@ -543,7 +543,7 @@
   );
   var tail_default = tail;
 
-  // node_modules/ramda/es/pipe.js
+  // ../node_modules/ramda/es/pipe.js
   function pipe() {
     if (arguments.length === 0) {
       throw new Error("pipe requires at least one argument");
@@ -551,22 +551,22 @@
     return _arity(arguments[0].length, reduce_default(_pipe, arguments[0], tail_default(arguments)));
   }
 
-  // node_modules/ramda/es/reverse.js
+  // ../node_modules/ramda/es/reverse.js
   var reverse = /* @__PURE__ */ _curry1(function reverse2(list) {
     return _isString(list) ? list.split("").reverse().join("") : Array.prototype.slice.call(list, 0).reverse();
   });
   var reverse_default = reverse;
 
-  // node_modules/ramda/es/internal/_identity.js
+  // ../node_modules/ramda/es/internal/_identity.js
   function _identity(x) {
     return x;
   }
 
-  // node_modules/ramda/es/identity.js
+  // ../node_modules/ramda/es/identity.js
   var identity = /* @__PURE__ */ _curry1(_identity);
   var identity_default = identity;
 
-  // node_modules/ramda/es/internal/_arrayFromIterator.js
+  // ../node_modules/ramda/es/internal/_arrayFromIterator.js
   function _arrayFromIterator(iter) {
     var list = [];
     var next;
@@ -576,7 +576,7 @@
     return list;
   }
 
-  // node_modules/ramda/es/internal/_includesWith.js
+  // ../node_modules/ramda/es/internal/_includesWith.js
   function _includesWith(pred, x, list) {
     var idx = 0;
     var len = list.length;
@@ -589,13 +589,13 @@
     return false;
   }
 
-  // node_modules/ramda/es/internal/_functionName.js
+  // ../node_modules/ramda/es/internal/_functionName.js
   function _functionName(f) {
     var match = String(f).match(/^function (\w*)/);
     return match == null ? "" : match[1];
   }
 
-  // node_modules/ramda/es/internal/_objectIs.js
+  // ../node_modules/ramda/es/internal/_objectIs.js
   function _objectIs(a, b) {
     if (a === b) {
       return a !== 0 || 1 / a === 1 / b;
@@ -605,7 +605,7 @@
   }
   var objectIs_default = typeof Object.is === "function" ? Object.is : _objectIs;
 
-  // node_modules/ramda/es/internal/_equals.js
+  // ../node_modules/ramda/es/internal/_equals.js
   function _uniqContentEquals(aIterator, bIterator, stackA, stackB) {
     var a = _arrayFromIterator(aIterator);
     var b = _arrayFromIterator(bIterator);
@@ -719,13 +719,13 @@
     return true;
   }
 
-  // node_modules/ramda/es/equals.js
+  // ../node_modules/ramda/es/equals.js
   var equals = /* @__PURE__ */ _curry2(function equals2(a, b) {
     return _equals(a, b, [], []);
   });
   var equals_default = equals;
 
-  // node_modules/ramda/es/internal/_indexOf.js
+  // ../node_modules/ramda/es/internal/_indexOf.js
   function _indexOf(list, a, idx) {
     var inf, item;
     if (typeof list.indexOf === "function") {
@@ -773,18 +773,18 @@
     return -1;
   }
 
-  // node_modules/ramda/es/internal/_includes.js
+  // ../node_modules/ramda/es/internal/_includes.js
   function _includes(a, list) {
     return _indexOf(list, a, 0) >= 0;
   }
 
-  // node_modules/ramda/es/internal/_quote.js
+  // ../node_modules/ramda/es/internal/_quote.js
   function _quote(s) {
     var escaped = s.replace(/\\/g, "\\\\").replace(/[\b]/g, "\\b").replace(/\f/g, "\\f").replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\t/g, "\\t").replace(/\v/g, "\\v").replace(/\0/g, "\\0");
     return '"' + escaped.replace(/"/g, '\\"') + '"';
   }
 
-  // node_modules/ramda/es/internal/_toISOString.js
+  // ../node_modules/ramda/es/internal/_toISOString.js
   var pad = function pad2(n) {
     return (n < 10 ? "0" : "") + n;
   };
@@ -795,14 +795,14 @@
   };
   var toISOString_default = _toISOString;
 
-  // node_modules/ramda/es/internal/_complement.js
+  // ../node_modules/ramda/es/internal/_complement.js
   function _complement(f) {
     return function() {
       return !f.apply(this, arguments);
     };
   }
 
-  // node_modules/ramda/es/internal/_filter.js
+  // ../node_modules/ramda/es/internal/_filter.js
   function _filter(fn, list) {
     var idx = 0;
     var len = list.length;
@@ -816,12 +816,12 @@
     return result;
   }
 
-  // node_modules/ramda/es/internal/_isObject.js
+  // ../node_modules/ramda/es/internal/_isObject.js
   function _isObject(x) {
     return Object.prototype.toString.call(x) === "[object Object]";
   }
 
-  // node_modules/ramda/es/internal/_xfilter.js
+  // ../node_modules/ramda/es/internal/_xfilter.js
   var XFilter = /* @__PURE__ */ function() {
     function XFilter2(f, xf) {
       this.xf = xf;
@@ -839,7 +839,7 @@
   });
   var xfilter_default = _xfilter;
 
-  // node_modules/ramda/es/filter.js
+  // ../node_modules/ramda/es/filter.js
   var filter = /* @__PURE__ */ _curry2(
     /* @__PURE__ */ _dispatchable(["filter"], xfilter_default, function(pred, filterable) {
       return _isObject(filterable) ? _reduce(function(acc, key) {
@@ -855,13 +855,13 @@
   );
   var filter_default = filter;
 
-  // node_modules/ramda/es/reject.js
+  // ../node_modules/ramda/es/reject.js
   var reject = /* @__PURE__ */ _curry2(function reject2(pred, filterable) {
     return filter_default(_complement(pred), filterable);
   });
   var reject_default = reject;
 
-  // node_modules/ramda/es/internal/_toString.js
+  // ../node_modules/ramda/es/internal/_toString.js
   function _toString(x, seen) {
     var recur = function recur2(y) {
       var xs = seen.concat([x]);
@@ -902,13 +902,13 @@
     }
   }
 
-  // node_modules/ramda/es/toString.js
+  // ../node_modules/ramda/es/toString.js
   var toString2 = /* @__PURE__ */ _curry1(function toString3(val) {
     return _toString(val, []);
   });
   var toString_default = toString2;
 
-  // node_modules/ramda/es/internal/_xreduceBy.js
+  // ../node_modules/ramda/es/internal/_xreduceBy.js
   var XReduceBy = /* @__PURE__ */ function() {
     function XReduceBy2(valueFn, valueAcc, keyFn, xf) {
       this.valueFn = valueFn;
@@ -945,7 +945,7 @@
   });
   var xreduceBy_default = _xreduceBy;
 
-  // node_modules/ramda/es/reduceBy.js
+  // ../node_modules/ramda/es/reduceBy.js
   var reduceBy = /* @__PURE__ */ _curryN(
     4,
     [],
@@ -959,13 +959,13 @@
   );
   var reduceBy_default = reduceBy;
 
-  // node_modules/ramda/es/countBy.js
+  // ../node_modules/ramda/es/countBy.js
   var countBy = /* @__PURE__ */ reduceBy_default(function(acc, elem) {
     return acc + 1;
   }, 0);
   var countBy_default = countBy;
 
-  // node_modules/ramda/es/internal/_Set.js
+  // ../node_modules/ramda/es/internal/_Set.js
   var _Set = /* @__PURE__ */ function() {
     function _Set2() {
       this._nativeSet = typeof Set === "function" ? /* @__PURE__ */ new Set() : null;
@@ -1101,7 +1101,7 @@
   }
   var Set_default = _Set;
 
-  // node_modules/ramda/es/internal/_xdrop.js
+  // ../node_modules/ramda/es/internal/_xdrop.js
   var XDrop = /* @__PURE__ */ function() {
     function XDrop2(n, xf) {
       this.xf = xf;
@@ -1123,7 +1123,7 @@
   });
   var xdrop_default = _xdrop;
 
-  // node_modules/ramda/es/drop.js
+  // ../node_modules/ramda/es/drop.js
   var drop = /* @__PURE__ */ _curry2(
     /* @__PURE__ */ _dispatchable(["drop"], xdrop_default, function drop2(n, xs) {
       return slice_default(Math.max(0, n), Infinity, xs);
@@ -1131,17 +1131,17 @@
   );
   var drop_default = drop;
 
-  // node_modules/ramda/es/last.js
+  // ../node_modules/ramda/es/last.js
   var last = /* @__PURE__ */ nth_default(-1);
   var last_default = last;
 
-  // node_modules/ramda/es/takeLast.js
+  // ../node_modules/ramda/es/takeLast.js
   var takeLast = /* @__PURE__ */ _curry2(function takeLast2(n, xs) {
     return drop_default(n >= 0 ? xs.length - n : 0, xs);
   });
   var takeLast_default = takeLast;
 
-  // node_modules/ramda/es/fromPairs.js
+  // ../node_modules/ramda/es/fromPairs.js
   var fromPairs = /* @__PURE__ */ _curry1(function fromPairs2(pairs) {
     var result = {};
     var idx = 0;
@@ -1153,7 +1153,7 @@
   });
   var fromPairs_default = fromPairs;
 
-  // node_modules/ramda/es/uniqBy.js
+  // ../node_modules/ramda/es/uniqBy.js
   var uniqBy = /* @__PURE__ */ _curry2(function uniqBy2(fn, list) {
     var set = new Set_default();
     var result = [];
@@ -1171,11 +1171,11 @@
   });
   var uniqBy_default = uniqBy;
 
-  // node_modules/ramda/es/uniq.js
+  // ../node_modules/ramda/es/uniq.js
   var uniq = /* @__PURE__ */ uniqBy_default(identity_default);
   var uniq_default = uniq;
 
-  // node_modules/ramda/es/invoker.js
+  // ../node_modules/ramda/es/invoker.js
   var invoker = /* @__PURE__ */ _curry2(function invoker2(arity, method) {
     return curryN_default(arity + 1, function() {
       var target = arguments[arity];
@@ -1187,11 +1187,11 @@
   });
   var invoker_default = invoker;
 
-  // node_modules/ramda/es/sum.js
+  // ../node_modules/ramda/es/sum.js
   var sum = /* @__PURE__ */ reduce_default(add_default, 0);
   var sum_default = sum;
 
-  // node_modules/ramda/es/sortBy.js
+  // ../node_modules/ramda/es/sortBy.js
   var sortBy = /* @__PURE__ */ _curry2(function sortBy2(fn, list) {
     return Array.prototype.slice.call(list, 0).sort(function(a, b) {
       var aa = fn(a);
@@ -1201,11 +1201,11 @@
   });
   var sortBy_default = sortBy;
 
-  // node_modules/ramda/es/toLower.js
+  // ../node_modules/ramda/es/toLower.js
   var toLower = /* @__PURE__ */ invoker_default(0, "toLowerCase");
   var toLower_default = toLower;
 
-  // node_modules/ramda/es/toPairs.js
+  // ../node_modules/ramda/es/toPairs.js
   var toPairs = /* @__PURE__ */ _curry1(function toPairs2(obj) {
     var pairs = [];
     for (var prop in obj) {
@@ -1593,6 +1593,7 @@
       await initializePredictionModels();
       console.log("Initialisation du clavier...");
       Keyboard.init();
+      Keyboard.open();
       console.log("Application pr\xEAte !");
     } catch (error) {
       console.error("Erreur critique lors du d\xE9marrage de l'application:", error);

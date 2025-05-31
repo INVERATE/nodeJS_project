@@ -357,6 +357,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
         console.log('Initialisation du clavier...');
         Keyboard.init();
+        Keyboard.open();
 
         console.log('Application prête !');
     } catch (error) {
