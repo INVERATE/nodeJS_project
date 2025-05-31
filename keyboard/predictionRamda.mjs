@@ -87,6 +87,10 @@ const getLetterTransitionProbs = (prefix) => {
 
 const combineProbabilities = (probsA, probsB, probsC) => {
     const weights = { A: 0.4, B: 0.4, C: 0.2 }; // Coefficients de poids qui permettent de modifier l'importance des modèles
+    // A+B+C = 1 !!!!
+    // A pour privilégier le mot le plus fréquent existant dans le corpus
+    // B pour privilégier le contexte
+    // C pour privilégier la transition des lettres
     const allKeys = R.uniq([
         ...R.keys(probsA), // trois petits points (...) permettent de concattener les tableaux
         ...R.keys(probsB),
