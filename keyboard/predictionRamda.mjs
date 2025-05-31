@@ -9,7 +9,7 @@ export let markovLetterTransitions = {};
  * @param {string[]} tokens - Liste de tokens extraits du corpus
  */
 export const setCorpusWords = (tokens) => {
-    wordFrequencyMap = R.countBy(R.toLower)(tokens);
+    wordFrequencyMap = R.countBy(R.toLower)(tokens); // Compte les occurrences de chaque mot pour favorer les mots les plus fréquents
 };
 
 /**
