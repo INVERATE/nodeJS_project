@@ -59,6 +59,7 @@ Cela a aussi introduit des difficultés en frontend : gestion des événements, 
 Pour lancer le projet et avoir l'affichage, il est nécessaire d'avoir npm installé sur sa machine. Il faut ensuite exécuter les commandes suivantes dans le terminal :
 
     npm install
+	npm install electron --save-dev
     cd keyboard
     npm run build
     npm start
