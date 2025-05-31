@@ -1,151 +1,125 @@
-
-// 5. Fonctions de prédiction
 import * as R from "ramda";
 
-let wordTransitions = {};
-let letterTransitions = {};
-
-export async function loadMarkovData() {
-    const wordRes = await fetch('./markov_word_transitions.json');
-    const letterRes = await fetch('./markov_letter_transitions.json');
-    wordTransitions = await wordRes.json();
-    letterTransitions = await letterRes.json();
-}
-
-
-export function getNextWordProbabilities(context) {
-    for (let n = R.length(context); n > 0; n--) {
-        const key = R.pipe(
-            R.takeLast(n),
-            R.join(' ')
-        )(context);
-        const options = wordTransitions[key];
-        if (options) return { options, contextUsed: n };
-    }
-    return { options: null, contextUsed: 0 };
-}
-
-export function completeWord(prefix, options) {
-    let best = null;
-    let bestProb = 0;
-
-    for (let word in options) {
-        if (R.startsWith(prefix)(word)) {
-            if (options[word] > bestProb) {
-                bestProb = options[word];
-                best = word;
-            }
-        }
-    }
-
-    return best ? best.slice(R.length(prefix)) : null;
-}
-
-export function predictLetterCompletion(wordSoFar) {
-    let result = '';
-    let current = wordSoFar[R.length(wordSoFar) - 1] || '';
-    while (true) {
-        const nextOptions = letterTransitions[current];
-        if (!nextOptions) break;
-
-        let best = null;
-        let bestProb = 0;
-
-        for (let letter in nextOptions) {
-            if (nextOptions[letter] > bestProb) {
-                bestProb = nextOptions[letter];
-                best = letter;
-            }
-        }
-
-        if (best === ' ' || !best) break;
-        result += best;
-        current = best;
-        if (R.length(result) > 15) break; // sécurité anti boucle infinie
-    }
-
-    return result;
-}
+export let wordFrequencyMap = {};
+export let markovWordTransitions = {};
+export let markovLetterTransitions = {};
 
 /**
- * Predicts the next most probable letters based on context and current word prefix
- * @param {string} currentPrefix - The current partial word being typed
- * @param {Object} wordOptions - Word transition probabilities from the context
- * @param {string} context - The context (previous words)
- * @returns {Object} Object with letters as keys and their probabilities as values
+ * Initialise la fréquence des mots du corpus
+ * @param {string[]} tokens - Liste de tokens extraits du corpus
  */
+export const setCorpusWords = (tokens) => {
+    wordFrequencyMap = R.countBy(R.toLower)(tokens);
+};
+
 /**
- * @param {string} currentPrefix
- * @param {Object<string, number>} wordOptions – dictionnaire mot → proba
- * @returns {Object<string, number>} – top 5 lettres suivantes + leur proba normalisée
+ * Charge les modèles Markov pré-entraînés
+ * @param {Object} wordTransitions - Transitions entre mots (bigrammes)
+ * @param {Object} letterTransitions - Transitions entre lettres
  */
+export const loadMarkovModels = (wordTransitions, letterTransitions) => {
+    markovWordTransitions = wordTransitions;
+    markovLetterTransitions = letterTransitions;
+};
 
-export function predictNextLetterProbs(currentPrefix, wordOptions = {}, context = '') {
-    const letterProbs = {};
-    let totalWeight = 0;
+/**
+ * Prédit les prochaines lettres en combinant contexte, transitions de mots et transitions de lettres
+ * @param {string[]} context - Contexte précédent (mots avant le mot actuel)
+ * @param {string} currentPrefix - Début du mot en cours d'écriture
+ * @returns {Object} - Objet { lettre: probabilité } trié par probabilité décroissante
+ */
+export const predictNextLetters = (context, currentPrefix) => {
+    const currentPrefixLower = currentPrefix.toLowerCase();
+    const contextLower = context.map(R.toLower);
 
-    // 1) mots issus du contexte
-    for (let word in wordOptions) {
-        if (!word.startsWith(currentPrefix)) continue;
-        const nextLetter = word[currentPrefix.length];
-        if (!nextLetter) continue;
-        const wp = wordOptions[word];
-        totalWeight += wp;
-        letterProbs[nextLetter] = (letterProbs[nextLetter] || 0) + wp;
-    }
+    const wordCompletionProbs = getWordCompletionProbs(currentPrefixLower);
+    const contextBasedProbs = getContextBasedProbs(contextLower, currentPrefixLower);
+    const letterTransitionProbs = getLetterTransitionProbs(currentPrefixLower);
 
-    // 2) transitions de lettres (dernière lettre du préfixe)
-    if (currentPrefix.length > 0) {
-        const lastChar = currentPrefix[currentPrefix.length - 1].toLowerCase();
-        const letterOptions = letterTransitions[lastChar] || {};
-        for (let l in letterOptions) {
-            const lp = letterOptions[l];
-            totalWeight += lp;
-            letterProbs[l] = (letterProbs[l] || 0) + lp * 0.7;
-        }
-    }
+    return combineProbabilities(wordCompletionProbs, contextBasedProbs, letterTransitionProbs);
+};
 
-    // 3) fallback si aucune proba
-    if (Object.keys(letterProbs).length === 0) {
-        const commonStarts = letterTransitions[''] || {};
-        for (let l in commonStarts) {
-            letterProbs[l] = commonStarts[l];
-            totalWeight += commonStarts[l];
-        }
-    }
+const getWordCompletionProbs = (prefix) => {
+    // Filtrer mots commençant par prefix et plus longs, récupérer la lettre suivante + fréquence
+    const filtered = R.pipe(
+        R.toPairs,
+        R.filter(([word]) => word.startsWith(prefix) && word.length > prefix.length),
+        R.reduce((acc, [word, freq]) => {
+            const nextChar = word[prefix.length];
+            acc[nextChar] = (acc[nextChar] || 0) + freq;
+            return acc;
+        }, {})
+    )(wordFrequencyMap);
 
-    // 4) normalisation
-    if (totalWeight > 0) {
-        for (let l in letterProbs) {
-            letterProbs[l] /= totalWeight;
-        }
-    }
+    const total = R.sum(R.values(filtered));
+    return total > 0 ? normalizeProbs(filtered, total) : {};
+};
 
-    // 5) on ne garde que les 5 lettres les plus probables
-    return Object.fromEntries(
-        Object.entries(letterProbs)
-            .sort(([, a], [, b]) => b - a)
-            .slice(0, 10)
-            .filter(([, p]) => p > 0.05) // seulement si la proba est > 0.05
+const getContextBasedProbs = (context, prefix) => {
+    if (context.length === 0) return {};
 
+    const contextKey = R.takeLast(2, context).join(" "); // Derniers deux mots
+    const nextWordDist = markovWordTransitions[contextKey] || {};
+
+    const filtered = R.pipe(
+        R.toPairs,
+        R.filter(([word]) => word.startsWith(prefix) && word.length > prefix.length),
+        R.reduce((acc, [word, prob]) => {
+            const nextChar = word[prefix.length];
+            acc[nextChar] = (acc[nextChar] || 0) + prob;
+            return acc;
+        }, {})
+    )(nextWordDist);
+
+    const total = R.sum(R.values(filtered));
+    return total > 0 ? normalizeProbs(filtered, total) : {};
+};
+
+const getLetterTransitionProbs = (prefix) => {
+    if (prefix.length === 0) return {};
+
+    const lastChars = prefix.slice(-2); // Derniers deux caractères
+    const transitions = markovLetterTransitions[lastChars] || {};
+
+    const total = R.sum(R.values(transitions));
+    return total > 0 ? normalizeProbs(transitions, total) : {};
+};
+
+const combineProbabilities = (probsA, probsB, probsC) => {
+    const weights = { A: 0.4, B: 0.4, C: 0.2 }; // Coefficients de poids qui permettent de modifier l'importance des modèles
+    const allKeys = R.uniq([
+        ...R.keys(probsA), // trois petits points (...) permettent de concattener les tableaux
+        ...R.keys(probsB),
+        ...R.keys(probsC),
+    ]);
+
+    const combined = R.reduce(
+        (acc, key) => ({
+            ...acc,
+            [key]:
+                (probsA[key] || 0) * weights.A +
+                (probsB[key] || 0) * weights.B +
+                (probsC[key] || 0) * weights.C,
+        }),
+        {},
+        allKeys
     );
-}
 
+    return normalizeAndSort(combined);
+};
 
+const normalizeProbs = (counts, total) =>
+    R.map((v) => v / total, counts);
 
-export function getMostProbableNextLetter(currentPrefix, options) {
-    const letterProbs = predictNextLetterProbs(currentPrefix, options);
+const normalizeAndSort = (probs) => {
+    const total = R.sum(R.values(probs));
+    if (total <= 0) return { " ": 1 };
 
-    let bestLetter = null;
-    let bestProb = 0;
-
-    for (let letter in letterProbs) {
-        if (letterProbs[letter] > bestProb) {
-            bestProb = letterProbs[letter];
-            bestLetter = letter;
-        }
-    }
-
-    return bestLetter;
-}
-
+    return R.pipe(
+        R.map((v) => v / total),
+        R.toPairs,
+        R.sortBy(R.last), // tri par probabilité
+        R.reverse,
+        R.fromPairs
+    )(probs);
+};

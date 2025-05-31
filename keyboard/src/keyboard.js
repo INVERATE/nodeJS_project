@@ -1,15 +1,69 @@
-import * as R from 'ramda';
+import { loadMarkovModels, predictNextLetters, setCorpusWords } from '../predictionRamda.mjs';
 
-import {
-    predictLetterCompletion,
-    predictNextLetterProbs,
-    getNextWordProbabilities,
-    loadMarkovData,
-    completeWord,
-    getMostProbableNextLetter,
-} from "../predictionRamda.mjs";
+// Variables pour stocker les modèles et l'état d'initialisation
+let isInitialized = false;
 
+// Fonction pour initialiser les modèles de prédiction
+async function initializePredictionModels() {
+    if (isInitialized) {
+        console.log('Les modèles sont déjà initialisés');
+        return;
+    }
 
+    try {
+        console.log('Vérification de predictionAPI...');
+        if (!window.predictionAPI) {
+            throw new Error('predictionAPI n\'est pas disponible dans le contexte de rendu');
+        }
+
+        console.log('Chargement du corpus...');
+        const corpusText = await window.predictionAPI.loadCorpus();
+
+        if (!corpusText) {
+            throw new Error('Le corpus est vide');
+        }
+
+        console.log('Corpus chargé, tokenisation en cours...');
+        // Tokenisation du texte
+        const tokens = corpusText
+            .toLowerCase()
+            .replace(/[^a-z0-9\s!:;,]/gi, ' ')
+            .split(/\s+/)
+            .filter(Boolean);
+
+        console.log(`Corpus tokenisé: ${tokens.length} tokens`);
+        setCorpusWords(tokens);
+
+        console.log('Chargement des modèles Markov...');
+        const markovData = await window.predictionAPI.loadMarkovData();
+
+        if (!markovData || !markovData.wordTransitions || !markovData.letterTransitions) {
+            throw new Error('Données Markov invalides');
+        }
+
+        const { wordTransitions, letterTransitions } = markovData;
+
+        console.log('Normalisation des modèles Markov...');
+        // Normalisation des clés en minuscules
+        const lowerWordTrans = Object.fromEntries(
+            Object.entries(wordTransitions).map(([k, dist]) => [
+                k.toLowerCase(),
+                Object.fromEntries(
+                    Object.entries(dist).map(([w, p]) => [w.toLowerCase(), p])
+                )
+            ])
+        );
+
+        console.log('Chargement des modèles...');
+        loadMarkovModels(lowerWordTrans, letterTransitions);
+        isInitialized = true;
+        console.log('Modèles de prédiction initialisés avec succès');
+    } catch (error) {
+        console.error('Erreur critique lors de l\'initialisation des modèles:', error);
+        // Ne pas lancer l'application si l'initialisation échoue
+        throw new Error(`Impossible d'initialiser les modèles de prédiction: ${error.message}`);
+    }
+}
 
 const Keyboard = {
     elements: {
@@ -27,7 +81,7 @@ const Keyboard = {
             "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "backspace",
             "a", "z", "e", "r", "t", "y", "u", "i", "o", "p",
             "caps", "q", "s", "d", "f", "g", "h", "j", "k", "l", "m", "enter",
-            "done", "w", "x", "c", "v", "b", "n", ",", ";", ":", "!", "space",
+            "done", "w", "x", "c", "v", "b", "n", ",", ".", "?", "'", "space",
         ],
     },
 
@@ -98,6 +152,36 @@ const Keyboard = {
         return this.keyElement;
     },
 
+    _updateKeyHighlights(context, lastWord) {
+        if (!isInitialized) return;
+
+        try {
+            const letterProbs = predictNextLetters(context, lastWord);
+
+            this.elements.keys.forEach((keyEl) => {
+                const char = (keyEl.dataset.char || keyEl.textContent.trim()).toLowerCase();
+
+                if (!letterProbs[char]) {
+                    keyEl.classList.remove("activeYellow", "activePurple");
+                    return;
+                }
+
+                const prob = letterProbs[char];
+                if (prob > 0.2) {
+                    keyEl.classList.add("activePurple");
+                    keyEl.classList.remove("activeYellow");
+                } else if (prob > 0.1 && prob <= 0.2) {
+                    keyEl.classList.add("activeYellow");
+                    keyEl.classList.remove("activePurple");
+                } else {
+                    keyEl.classList.remove("activeYellow", "activePurple");
+                }
+            });
+        } catch (error) {
+            console.error("Erreur lors de la mise à jour des surlignages:", error);
+        }
+    },
+
 
     _createKeys() {
         const fragment =
@@ -112,10 +196,16 @@ const Keyboard = {
                     this._createKeyBtn(
                         "backspace", "keyboard__key--wide",
                         () => {
-                            this.properties.value =
-                                this.properties.value.slice(0, -1);
+                            this.properties.value = this.properties.value.slice(0, -1);
                             this._updateValueInTarget();
-                        });
+
+                            const currentValue = this.properties.value.trim().split(/\s+/);
+                            const lastWord = currentValue[currentValue.length - 1] || "";
+                            const context = currentValue.slice(0, -1);
+
+                            this._updateKeyHighlights(context, lastWord);
+                        }
+                    );
                     break;
 
                 case "caps":
@@ -149,10 +239,18 @@ const Keyboard = {
                         () => {
                             this.properties.value += " ";
                             this._updateValueInTarget();
+
+                            // Préparer un nouveau contexte pour prédiction d’un nouveau mot
+                            const currentValue = this.properties.value.trim().split(/\s+/);
+                            const context = currentValue; // dernier mot étant vide
+                            const lastWord = ""; // nouveau mot vide
+
+                            this._updateKeyHighlights(context, lastWord);
                         },
                         "", // pas de class2
                         " " // data-char pour la touche espace
                     );
+
                     fragment.appendChild(spaceBtn);
                     break;
 
@@ -181,50 +279,9 @@ const Keyboard = {
                         // Trouver le mot actuel
                         const currentValue = this.properties.value.trim().split(/\s+/);
                         const lastWord = currentValue[currentValue.length - 1] || "";
+                        const context = currentValue.slice(0, -1);
 
-                        const context = currentValue.slice(0, -1); // ⚠️ important
-                        const { options } = getNextWordProbabilities(context);
-
-                        const word = completeWord(lastWord, options);
-
-
-                        console.log("Valeur tapée :", this.properties.value);
-                        console.log("Mot en cours :", lastWord);
-                        console.log("Contexte :", context);
-                        console.log("Options:", options);
-                        console.log("Mots en train de taper prédit:", word);
-                        console.log("Letter probs (filtered):", predictNextLetterProbs(lastWord, options));
-                        console.log("most probable letter:", getMostProbableNextLetter(lastWord, options));
-
-
-                        //prédire les prochaines lettres en fonctione des mots précédents et du mot en cours
-
-                        let letterProbs = predictNextLetterProbs(lastWord, options);
-
-                        this.elements.keys.forEach((keyEl) => {
-                            //const char = keyEl.textContent.toLowerCase();
-                            const char = (keyEl.dataset.char || keyEl.textContent.trim()).toLowerCase();
-
-                            if (!letterProbs[char]) {
-                                keyEl.classList.remove("activeYellow");
-                                keyEl.classList.remove("activePurple");
-                            }
-                            const prob = letterProbs[char];
-
-                            if (prob > 0.2) {
-                                keyEl.classList.add("activePurple");
-                                keyEl.classList.remove("activeYellow");
-                            } else if (prob > 0 && prob <= 0.2) {
-                                keyEl.classList.add("activeYellow");
-                                keyEl.classList.remove("activePurple");
-                            } else {
-                                keyEl.classList.remove("activeYellow");
-                                keyEl.classList.remove("activePurple");
-                            }
-
-                        });
-
-
+                        this._updateKeyHighlights(context, lastWord);
                     });
 
                     // Affichage de la lettre sur la touche
@@ -288,15 +345,23 @@ const Keyboard = {
 };
 
 
+// Initialiser le clavier et les modèles de prédiction
 window.addEventListener("DOMContentLoaded", async () => {
-    await loadMarkovData();
-    Keyboard.init();
-    // Ajout d'une animation douce pour le clavier
-    setTimeout(() => {
-        Keyboard.elements.main.classList.add("keyboard--visible");
-    }, 100); // petit délai pour déclencher la transition CSS
+    try {
+        console.log('Initialisation des modèles de prédiction...');
+        await initializePredictionModels();
 
+        console.log('Initialisation du clavier...');
+        Keyboard.init();
+
+        console.log('Application prête !');
+    } catch (error) {
+        console.error('Erreur critique lors du démarrage de l\'application:', error);
+        // Afficher un message d'erreur à l'utilisateur si nécessaire
+        alert('Une erreur est survenue lors du démarrage de l\'application. Veuillez consulter la console pour plus de détails.');
+    }
 });
+
 
 
 

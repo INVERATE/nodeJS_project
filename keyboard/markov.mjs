@@ -16,22 +16,28 @@ const corpus7 = fs.readFileSync('../datasets/2007-J.-K.-Rowling-Tome-7-Harry-Pot
 const corpus8 = fs.readFileSync('../datasets/2016-J.-K.txt', 'utf-8');
 const corpus9 = fs.readFileSync('../datasets/2016-J.-K_1.txt', 'utf-8');
 
-const corpus = corpus1 + corpus2 + corpus3 + corpus5 ;
+const corpus = corpus1 + corpus2 + corpus3 + corpus4 + corpus5+corpus6+corpus7+corpus8+corpus9;
 //const corpus = fs.readFileSync('./datasets/lacomediehumaine.txt', 'utf-8');
 
 // === 2. Tokenisation ===
-function tokenize(text) {
-    return R.split(/\s+/,
-        R.replace(/[.,!?;:()"'-]/g, '',
-            R.toLower(text)));
-}
+const tokenize = text => R.pipe(
+    R.toLower,
+    R.replace(/[éèêë]/g, 'e'),
+    R.replace(/[àä]/g, 'a'),
+    R.replace(/[îï]/g, 'i'),
+    R.replace(/[óôö]/g, 'o'),
+    R.replace(/[üù]/g, 'u'),
+    R.replace(/[!;:()"\-]/g, ' '),
+    R.trim,
+    R.split(/\s+/)
+)(text);
 
 const tokens = tokenize(corpus);
 
 // === 3. Chaîne de Markov sur les mots ===
 const wordTransitions = new Map();
-//on prend en comppte les 5 mot avant dans la phrase
-for (let n = 1; n <= 5; n++) {
+//on prend en comppte les 2 mot avant dans la phrase
+for (let n = 1; n <= 2; n++) {
     for (let i = 0; i <= R.length(tokens) - n; i++) {
         const key = R.join(' ', R.slice(i, i + n, tokens));
         const next = tokens[i + n];
