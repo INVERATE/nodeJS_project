@@ -1446,6 +1446,7 @@
       this.keyElement.addEventListener("click", onclick);
       return this.keyElement;
     },
+    // Mise à jour des surlignages des touches du clavier selon la probabilité des lettres suivantes
     _updateKeyHighlights(context, lastWord) {
       if (!isInitialized) return;
       try {
@@ -1471,6 +1472,7 @@
         console.error("Erreur lors de la mise \xE0 jour des surlignages:", error);
       }
     },
+    // Création des touches du clavier
     _createKeys() {
       const fragment = document.createDocumentFragment();
       this.properties.keyLayout.forEach((key) => {
@@ -1594,7 +1596,7 @@
       console.log("Application pr\xEAte !");
     } catch (error) {
       console.error("Erreur critique lors du d\xE9marrage de l'application:", error);
-      alert("Une erreur est survenue lors du d\xE9marrage de l'application. Veuillez consulter la console pour plus de d\xE9tails.");
+      alert("Une erreur est survenue lors du d\xE9marrage de l'application");
     }
   });
 })();

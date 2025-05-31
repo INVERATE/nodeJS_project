@@ -4,7 +4,7 @@ const path = require('path');
 
 // Fonction pour charger le corpus depuis les fichiers texte
 async function loadCorpus() {
-    try {
+    try { // oui, il y a beaucoup de petits points de suspension ici
         const files = [
             path.join(__dirname, '..', '..', 'datasets', '1997-J.-K.-Rowling-Tome-1-Harry-Potter-à-l_école-des-sorciers.txt'),
             path.join(__dirname, '..', '..', 'datasets', '1998-J.-K.-Rowling-Tome-2-Harry-Potter-et-la-Chambre-des-secrets.txt'),

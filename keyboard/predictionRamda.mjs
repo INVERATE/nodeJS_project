@@ -13,7 +13,7 @@ export const setCorpusWords = (tokens) => {
 };
 
 /**
- * Charge les modèles Markov pré-entraînés
+ * Charge les modèles Markov
  * @param {Object} wordTransitions - Transitions entre mots (bigrammes)
  * @param {Object} letterTransitions - Transitions entre lettres
  */
@@ -113,7 +113,7 @@ const normalizeProbs = (counts, total) =>
 
 const normalizeAndSort = (probs) => {
     const total = R.sum(R.values(probs));
-    if (total <= 0) return { " ": 1 };
+    if (total <= 0) return { " ": 1 }; // cas particulier lorsque probs est vide, permet de passer au mot suivant
 
     return R.pipe(
         R.map((v) => v / total),

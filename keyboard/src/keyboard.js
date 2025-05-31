@@ -1,6 +1,6 @@
 import { loadMarkovModels, predictNextLetters, setCorpusWords } from '../predictionRamda.mjs';
 
-// Variables pour stocker les modèles et l'état d'initialisation
+// Variables pour l'état d'initialisation, en résumé voir si les modèles sont chargés
 let isInitialized = false;
 
 // Fonction pour initialiser les modèles de prédiction
@@ -24,7 +24,7 @@ async function initializePredictionModels() {
         }
 
         console.log('Corpus chargé, tokenisation en cours...');
-        // Tokenisation du texte
+        // Tokenisation du texte, permet d'obtenir un tableau de mots
         const tokens = corpusText
             .toLowerCase()
             .replace(/[^a-z0-9\s!:;,]/gi, ' ')
@@ -65,6 +65,8 @@ async function initializePredictionModels() {
     }
 }
 
+
+// Initialiser le clavier
 const Keyboard = {
     elements: {
         main: null,
@@ -152,6 +154,7 @@ const Keyboard = {
         return this.keyElement;
     },
 
+    // Mise à jour des surlignages des touches du clavier selon la probabilité des lettres suivantes
     _updateKeyHighlights(context, lastWord) {
         if (!isInitialized) return;
 
@@ -183,6 +186,7 @@ const Keyboard = {
     },
 
 
+    // Création des touches du clavier
     _createKeys() {
         const fragment =
             document.createDocumentFragment();
@@ -358,7 +362,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     } catch (error) {
         console.error('Erreur critique lors du démarrage de l\'application:', error);
         // Afficher un message d'erreur à l'utilisateur si nécessaire
-        alert('Une erreur est survenue lors du démarrage de l\'application. Veuillez consulter la console pour plus de détails.');
+        alert('Une erreur est survenue lors du démarrage de l\'application');
     }
 });
 

@@ -5,7 +5,7 @@ function createWindow() {
     console.log('Démarrage de l\'application...');
     console.log('Chemin du preload:', path.join(__dirname, 'src', 'preload.js'));
     
-    // Vérifier si le fichier preload existe
+    // Vérifier si le fichier preload existe bien, on a eu trop de problème à cause de ça
     const preloadPath = path.join(__dirname, 'src', 'preload.js');
     try {
         require('fs').accessSync(preloadPath);
@@ -28,7 +28,7 @@ function createWindow() {
     });
 
 
-    win.loadFile('keyboard.html');
+    win.loadFile('keyboard.html'); // charge l'interface
 }
 
 app.whenReady().then(() => {
