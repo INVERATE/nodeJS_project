@@ -1,4 +1,6 @@
-Groupe : 
+Ceci est un test
+
+Groupe :
 Néo COLPIN
 Fanny BADOULES
 Thibault MORETTI
@@ -14,3 +16,90 @@ u
 L’extension .mjs signifie “Module JavaScript”, et elle sert à indiquer à Node.js que le fichier utilise la syntaxe de modules ECMAScript (ESM), c’est-à-dire :
 
     import / export au lieu de require() / module.exports
+
+
+Clavier virtuel avec prédictions 🧠⌨️
+Groupe :
+
+Néo COLPIN
+
+Fanny BADOULES
+
+Thibault MORETTI
+
+Ce clavier virtuel met en évidence les lettres les plus probables à taper en fonction :
+
+des mots précédents
+
+des lettres déjà saisies dans le mot en cours
+
+et des mots existants dans un dictionnaire
+
+
+✨ Fonctionnalités
+Mise en valeur dynamique des lettres en fonction du contexte.
+
+Différents niveaux de surbrillance selon la probabilité :
+
+Lettre neutre : pas de surbrillance.
+
+Probabilité entre 10–20 % : jaune.
+
+Probabilité > 20 % : rouge.
+
+Fonctionnalités à venir...
+
+📚 Corpus
+L’algorithme s’appuie sur un corpus issu des livres de Harry Potter. Ce choix a été motivé par :
+
+une longueur suffisante du corpus,
+
+une syntaxe correcte et fluide,
+
+une complexité accessible, sans tomber dans un style trop littéraire.
+
+Des œuvres comme La Comédie humaine de Balzac ont été écartées car trop éloignées du langage courant.
+
+⚠️ Limite actuelle :
+L'univers de Harry Potter contient des mots spécifiques (moldu, Voldemort, etc.), ce qui peut biaiser certaines prédictions.
+
+C’est un début, dit Voldemort. Mais Thicknesse n’est qu’un individu isolé. Pour que je puisse agir, il faut que Scrimgeour soit entouré de gens qui nous sont acquis.
+
+🔧 Amélioration possible : enrichir le corpus avec des textes issus de Wikipédia ou de sites d’actualité via du web scraping.
+
+🔗 Modèle utilisé : chaîne de Markov
+(📌 Ajouter ici un schéma Markdown ou Mermaid d'une chaîne de Markov)
+
+Une chaîne de Markov est un modèle probabiliste dans lequel la probabilité d’un événement dépend uniquement de l’état précédent.
+Dans notre cas, la probabilité qu’une lettre apparaisse dépend :
+
+du mot en cours,
+
+et des mots précédemment saisis (jusqu'à 2 pour notre implémentation).
+
+🖥️ Interface graphique avec Electron
+Nous avons choisi Electron pour l’interface graphique, plutôt qu’un affichage en terminal, afin de :
+
+rendre l’outil plus visuel et interactif,
+
+faciliter l’intégration HTML/CSS pour styliser les lettres.
+
+Cela a aussi introduit des difficultés en frontend : gestion des événements, rafraîchissement du clavier, synchronisation entre la saisie et les prédictions...
+
+Clavier inspiré du projet de ce développeur.
+
+🧪 Tester la prédiction dans le terminal
+Il est aussi possible de tester la prédiction directement dans le terminal via le fichier test_prediction.js.
+C’est une méthode simple et efficace pour le debug, plus rapide que d'utiliser les outils développeur du navigateur ou d’Electron.
+
+js
+Copy
+Edit
+// Exemple de test de prédiction
+const context = ["vous", "etes"];
+const currentWord = "be"; // MODIFIER ICI POUR TESTER UNE AUTRE PREDICTION
+const nextLetterProbs = predictNextLetters(context, currentWord);
+console.log("Probabilités :", nextLetterProbs);
+📌 Limite du contexte :
+Nous utilisons un maximum de 2 mots précédents.
+Au-delà, les combinaisons deviennent trop rares dans le corpus, et les fichiers de probabilités deviennent très volumineux (plusieurs centaines de Mo pour 4 ou 5 mots de contexte).
